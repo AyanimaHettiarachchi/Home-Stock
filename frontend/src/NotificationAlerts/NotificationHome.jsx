@@ -163,7 +163,7 @@ function NotificationHome() {
             />
             <p className="text-white text-sm">© 2025 Notification Hub. All rights reserved.</p>
           </div>
-          <p className="text-gray-400 text-xs">Powered by xAI</p>
+          <p className="text-gray-400 text-xs">Powered by AT</p>
         </footer>
       </div>
     </div>
