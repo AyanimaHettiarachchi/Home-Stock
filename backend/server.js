@@ -9,9 +9,9 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173', // Adjust to match your frontend port (e.g., Vite default)
+  origin: 'http://localhost:5173', // Adjust to match your frontend port
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true, // Allow cookies/auth credentials if needed
+  credentials: true,
 }));
 
 // Routes
@@ -28,12 +28,12 @@ mongoose.connect(connectionString, {
   .then(() => console.log('Database connected successfully'))
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   });
 
 // Server Port
 const port = 7001;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 

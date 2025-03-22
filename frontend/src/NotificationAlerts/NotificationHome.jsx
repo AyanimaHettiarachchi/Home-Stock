@@ -1,6 +1,13 @@
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion'; // For animations
 
 function NotificationHome() {
+  // Animation variants for fade-in
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
+  };
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
@@ -9,58 +16,67 @@ function NotificationHome() {
       }}
     >
       {/* Overlay for Readability */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-black/50 md:bg-black/40 lg:bg-black/30"></div>
 
-      <div className="relative max-w-7xl mx-auto min-h-screen flex flex-col justify-between">
+      <div className="relative min-h-screen flex flex-col">
         {/* Header */}
-        <header className="py-4 flex justify-between items-center px-4 md:px-6">
-          <div className="flex items-center space-x-3">
-            <NavLink to="https://example.com" target="_blank" rel="noopener noreferrer">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
-                alt="Header Logo"
-                className="w-10 h-10 object-contain hover:opacity-80 transition-opacity"
-              />
-            </NavLink>
-            <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text">
-              Notification Hub
-            </h2>
+        <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
+          <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 md:px-6">
+            <div className="flex items-center space-x-4">
+              <NavLink to="/">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
+                  alt="Header Logo"
+                  className="w-12 h-12 object-contain hover:scale-105 transition-transform duration-300"
+                />
+              </NavLink>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">
+                Home Stock 
+              </h1>
+            </div>
+            <nav className="flex space-x-4 md:space-x-6">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/notification-and-expiry-alerts"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Notifications
+              </NavLink>
+              <NavLink
+                to="/notification-settings"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Settings
+              </NavLink>
+            </nav>
           </div>
-          <nav className="hidden md:flex space-x-6">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-white hover:text-blue-200 transition-colors ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/notifications"
-              className={({ isActive }) =>
-                `text-white hover:text-blue-200 transition-colors ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
-              Alerts
-            </NavLink>
-            <NavLink
-              to="/notification-settings"
-              className={({ isActive }) =>
-                `text-white hover:text-blue-200 transition-colors ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
-              Settings
-            </NavLink>
-          </nav>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 flex items-center justify-center px-4 md:px-6">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text">
+        <main className="flex-1 flex items-center justify-center px-4 md:px-6 py-10">
+          <motion.div
+            className="text-center max-w-4xl mx-auto"
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+          >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
               Notification & Expiry Alerts
             </h1>
-            <p className="text-gray-200 text-lg mb-10">Manage your alerts with ease and efficiency.</p>
+            <p className="text-gray-100 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed">
+              Manage your alerts with ease and efficiency.
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <NavLink
@@ -150,24 +166,38 @@ function NotificationHome() {
                 </div>
               </NavLink>
             </div>
-          </div>
+          </motion.div>
         </main>
 
         {/* Footer */}
-        <footer className="py-4 px-4 md:px-6 bg-black/20 backdrop-blur-md text-center">
-          <div className="flex justify-center items-center space-x-3 mb-2">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
-              alt="Footer Logo"
-              className="w-8 h-8 object-contain"
-            />
-            <p className="text-white text-sm">© 2025 Notification Hub. All rights reserved.</p>
+        <footer className="w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
+          <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
+            <div className="flex justify-center items-center space-x-3 mb-4">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
+                alt="Footer Logo"
+                className="w-10 h-10 object-contain hover:scale-105 transition-transform duration-300"
+              />
+              <p className="text-white text-sm md:text-base">© 2025 Home Stock. All rights reserved.</p>
+            </div>
+            <div className="flex justify-center space-x-4 md:space-x-6 mb-4">
+              <a href="#about" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
+                About
+              </a>
+              <a href="#contact" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
+                Contact
+              </a>
+              <a href="#privacy" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
+                Privacy Policy
+              </a>
+            </div>
+            <p className="text-gray-400 text-xs md:text-sm">Powered by xAI</p>
           </div>
-          <p className="text-gray-400 text-xs">Powered by AT</p>
         </footer>
       </div>
     </div>
   );
 }
+
 
 export default NotificationHome;
