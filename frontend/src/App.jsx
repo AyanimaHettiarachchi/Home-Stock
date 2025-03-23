@@ -5,6 +5,7 @@ import Notifications from './NotificationAlerts/Notifications';
 import NotificationSettings from './NotificationAlerts/NotificationSettings';
 import NotificationHistory from './NotificationAlerts/NotificationHistory';
 import AlertCreation from './NotificationAlerts/AlertCreation';
+import MealList from './MealPlaning/MealList';
 
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
         <Route path="/notification-settings" element={<NotificationSettings />} />
         <Route path="/notification-history" element={<NotificationHistory />} />
         <Route path="/alert-creation" element={<AlertCreation />} />
+
+        <Route path="/MealList" element={<MealList/>} />
       </Routes>
     </BrowserRouter>
   );
