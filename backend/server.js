@@ -8,7 +8,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173', // Adjust to match your frontend port (e.g., 3000 if using CRA)
+  origin: 'http://localhost:5173', // Adjust to match your frontend port
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
