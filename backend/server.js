@@ -20,6 +20,7 @@ const mealRoutes = require('./routes/mealRoutes');
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/meals', mealRoutes);
 
+
 // MongoDB Connection
 const connectionString = process.env.CONNECTION_STRING;
 

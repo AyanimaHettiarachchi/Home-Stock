@@ -52,6 +52,14 @@ function Home() {
                 Notifications
               </NavLink>
               <NavLink
+                to="/meal-planning-dashboard"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Meal Planning
+              </NavLink>
+              <NavLink
                 to="/notification-settings"
                 className={({ isActive }) =>
                   `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
