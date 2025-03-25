@@ -4,7 +4,7 @@ import NotificationHome from './NotificationAlerts/NotificationHome';
 import Notifications from './NotificationAlerts/Notifications';
 import NotificationSettings from './NotificationAlerts/NotificationSettings';
 import NotificationHistory from './NotificationAlerts/NotificationHistory';
-import AlertCreation from './NotificationAlerts/AlertCreation';
+import UserFeedback from './NotificationAlerts/UserFeedback';
 
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/notification-settings" element={<NotificationSettings />} />
         <Route path="/notification-history" element={<NotificationHistory />} />
-        <Route path="/alert-creation" element={<AlertCreation />} />
+        <Route path="/user-message-form" element={<UserFeedback />} />
       </Routes>
     </BrowserRouter>
   );
