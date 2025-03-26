@@ -40,14 +40,35 @@ function UserFeedback() {
       setError('Name must be at least 2 characters long.');
       return;
     }
+    // New validation: Name should only contain letters and spaces (no numbers or special characters)
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.userName)) {
+      setError('Name can only contain letters and spaces (no numbers or special characters).');
+      return;
+    }
+
     if (!formData.phoneNumber || !/^\+?[1-9]\d{1,14}$/.test(formData.phoneNumber)) {
       setError('Please enter a valid phone number (e.g., +1234567890).');
       return;
     }
+    // New validation: Phone number should only contain numbers and an optional leading '+' (no letters or special characters)
+    const phoneRegex = /^\+?\d+$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      setError('Phone number can only contain numbers and an optional leading "+" (no letters or special characters).');
+      return;
+    }
+
     if (!formData.feedbackMessage || formData.feedbackMessage.length < 10) {
       setError('Feedback message must be at least 10 characters long.');
       return;
     }
+    // New validation: Feedback message should not contain special characters (only letters, numbers, and spaces)
+    const feedbackRegex = /^[A-Za-z0-9\s]+$/;
+    if (!feedbackRegex.test(formData.feedbackMessage)) {
+      setError('Feedback message can only contain letters, numbers, and spaces (no special characters).');
+      return;
+    }
+
     if (formData.rating < 1 || formData.rating > 5) {
       setError('Please select a rating between 1 and 5 stars.');
       return;
@@ -363,7 +384,6 @@ function UserFeedback() {
                 Privacy Policy
               </a>
             </div>
-            <p className="text-gray-400 text-xs md:text-sm">Powered by AT</p>
           </div>
         </footer>
       </div>

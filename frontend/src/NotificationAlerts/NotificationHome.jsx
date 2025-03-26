@@ -92,7 +92,7 @@ function NotificationHome() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
               Notification & Expiry Alerts
             </h1>
-            <p className="text-gray-100 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed">
+            <p className="text-gray-50 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed">
               Welcome, {userName}! Manage your alerts with ease and efficiency.
             </p>
 
@@ -126,7 +126,7 @@ function NotificationHome() {
                     <p className="text-gray-600 text-sm">View and manage active alerts</p>
                   </div>
                 </div>
-                <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                <span className="absolute top-2 right-2 bg-blue-200 text-blue-900 text-xs px-2 py-1 rounded-full">
                   New
                 </span>
               </NavLink>
@@ -220,9 +220,27 @@ function NotificationHome() {
             </div>
           </div>
         </footer>
+        {/* Floating Action Button (FAB) for quick access to settings */}
+        <NavLink to="/notification-settings">
+          <motion.div
+            className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-400 to-purple-300 p-4 rounded-full shadow-lg border border-white/20"
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
+              alt="Quick Settings"
+              className="w-8 h-8 object-contain"
+            />
+          </motion.div>
+        </NavLink>
       </div>
     </div>
   );
 }
 
 export default NotificationHome;
+
+
+

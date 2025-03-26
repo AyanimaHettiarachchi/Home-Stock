@@ -5,6 +5,9 @@ import Notifications from './NotificationAlerts/Notifications';
 import NotificationSettings from './NotificationAlerts/NotificationSettings';
 import NotificationHistory from './NotificationAlerts/NotificationHistory';
 import UserFeedback from './NotificationAlerts/UserFeedback';
+import About from './HomePage/About'; // New page
+import Contact from './HomePage/Contact'; // New page
+import PrivacyPolicy from './HomePage/PrivacyPolicy'; // New page
 
 
 function App() {
@@ -12,6 +15,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} /> {/* New route */}
+        <Route path="/contact" element={<Contact />} /> {/* New route */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* New route */}
         <Route path="/notification-and-expiry-alerts" element={<NotificationHome />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/notification-settings" element={<NotificationSettings />} />

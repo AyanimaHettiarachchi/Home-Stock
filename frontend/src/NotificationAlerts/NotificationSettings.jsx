@@ -50,6 +50,12 @@ function NotificationSettings() {
       setError('Name must be at least 2 characters long.');
       return;
     }
+    // New validation: Name should only contain letters and spaces (no numbers or special characters)
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      setError('Name can only contain letters and spaces (no numbers or special characters).');
+      return;
+    }
     if (formData.lowStockThreshold < 1 || formData.expiryThresholdDays < 1) {
       setError('Threshold values must be at least 1.');
       return;
@@ -72,6 +78,12 @@ function NotificationSettings() {
     // Validation
     if (!formData.name || formData.name.length < 2) {
       setError('Name must be at least 2 characters long.');
+      return;
+    }
+    // New validation: Name should only contain letters and spaces (no numbers or special characters)
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      setError('Name can only contain letters and spaces (no numbers or special characters).');
       return;
     }
     if (formData.lowStockThreshold < 1 || formData.expiryThresholdDays < 1) {
@@ -388,7 +400,6 @@ function NotificationSettings() {
                 Privacy Policy
               </a>
             </div>
-            <p className="text-gray-400 text-xs md:text-sm">Powered by AT</p>
           </div>
         </footer>
       </div>

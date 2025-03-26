@@ -1,21 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion'; // For animations
+import { motion } from 'framer-motion';
 
-function Home() {
-  // Animation variants for fade-in
+function About() {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
-  };
-
-  // Animation variants for navigation links
-  const navLinkVariants = {
-    hover: { 
-      scale: 1.1, 
-      color: '#d1b3ff', 
-      transition: { duration: 0.3, ease: 'easeOut' } 
-    },
-    tap: { scale: 0.95, transition: { duration: 0.2 } }
   };
 
   return (
@@ -25,7 +14,6 @@ function Home() {
         backgroundImage: `url(https://img.freepik.com/free-photo/girl-picking-something-eat-out-fridge_53876-144799.jpg?t=st=1742376257~exp=1742379857~hmac=a7b25e6989e87ee5fb06bc1e52ffa9affa046a7e9f832e78660efb0a60c9744f&w=900)`,
       }}
     >
-      {/* Overlay for Readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/30"></div>
 
       <div className="relative min-h-screen flex flex-col">
@@ -50,32 +38,26 @@ function Home() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  Home
-                </motion.span>
+                Home
               </NavLink>
               <NavLink
                 to="/notification-and-expiry-alerts"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  Notifications
-                </motion.span>
+                Notifications
               </NavLink>
               <NavLink
                 to="/notification-settings"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  Settings
-                </motion.span>
+                Settings
               </NavLink>
             </nav>
           </div>
@@ -84,35 +66,30 @@ function Home() {
         {/* Main Content */}
         <main className="flex-1 flex items-center justify-center px-4 md:px-6 py-10">
           <motion.div
-            className="text-center max-w-4xl mx-auto"
+            className="text-center max-w-4xl mx-auto bg-white/10 backdrop-blur-lg p-8 rounded-xl shadow-lg border border-white/20"
             initial="hidden"
             animate="visible"
             variants={fadeIn}
           >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
-              Welcome to Home Stock
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] mb-6">
+              About Home Stock
             </h1>
-            <p className="text-gray-50 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed drop-shadow-md">
-              Organize your inventory, track expirations, and stay alerted with our intuitive management system.
+            <p className="text-gray-100 text-lg sm:text-xl md:text-2xl mb-6 font-light leading-relaxed drop-shadow-md">
+              Home Stock is your ultimate solution for managing household inventory. Whether you're tracking food expiration dates, organizing your pantry, or setting up notifications for low stock, we've got you covered.
             </p>
-            <div className="flex justify-center space-x-4 md:space-x-6">
-              <NavLink
-                to="/notification-and-expiry-alerts"
-                className="bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-lg font-semibold hover:from-black hover:to-blue-900 transform hover:scale-105 transition-all duration-300 shadow-lg"
-              >
-                Get Started
-              </NavLink>
-              <NavLink
-                to="/notification-settings"
-                className="bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-lg font-semibold hover:from-black hover:to-purple-900 transform hover:scale-105 transition-all duration-300 shadow-lg"
-              >
-                Configure Settings
-              </NavLink>
-            </div>
+            <p className="text-gray-300 text-base sm:text-lg md:text-xl mb-10 font-light leading-relaxed drop-shadow-md">
+              Our mission is to simplify your life by providing an intuitive and efficient platform to keep your home organized. Built with love and powered by modern technology, Home Stock ensures you never run out of essentials again.
+            </p>
+            <NavLink
+              to="/"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg"
+            >
+              Back to Home
+            </NavLink>
           </motion.div>
         </main>
 
-        {/* Updated Footer */}
+        {/* Footer */}
         <footer className="w-full bg-gradient-to-r from-gray-900/70 to-gray-900/70 backdrop-blur-lg shadow-xl border-t border-gray-700/30">
           <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
             <div className="flex justify-center items-center space-x-3 mb-4">
@@ -129,32 +106,26 @@ function Home() {
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  About
-                </motion.span>
+                About
               </NavLink>
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  Contact
-                </motion.span>
+                Contact
               </NavLink>
               <NavLink
                 to="/privacy-policy"
                 className={({ isActive }) =>
-                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                  Privacy Policy
-                </motion.span>
+                Privacy Policy
               </NavLink>
             </div>
           </div>
@@ -164,4 +135,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default About;
