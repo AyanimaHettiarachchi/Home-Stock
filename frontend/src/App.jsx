@@ -1,25 +1,27 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './HomePage/Home';
-import NotificationHome from './NotificationAlerts/NotificationHome';
-import Notifications from './NotificationAlerts/Notifications';
-import NotificationSettings from './NotificationAlerts/NotificationSettings';
-import NotificationHistory from './NotificationAlerts/NotificationHistory';
-import AlertCreation from './NotificationAlerts/AlertCreation';
+import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import CreateFamily from "./pages/CreateFamily";
+import JoinFamily from "./pages/JoinFamily";
+import Inventory from "./pages/Inventory";
+import Footer from "./components/Footer";
 
-
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
+    <AuthProvider>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/notification-and-expiry-alerts" element={<NotificationHome />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/notification-settings" element={<NotificationSettings />} />
-        <Route path="/notification-history" element={<NotificationHistory />} />
-        <Route path="/alert-creation" element={<AlertCreation />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/create-family" element={<CreateFamily />} />
+        <Route path="/join-family" element={<JoinFamily />} />
+        <Route path="/inventory" element={<Inventory />} />
       </Routes>
-    </BrowserRouter>
+      <Footer />
+    </AuthProvider>
   );
-}
+};
 
 export default App;

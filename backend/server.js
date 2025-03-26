@@ -1,26 +1,34 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const cors = require("cors");
+const cookieParser = require("cookie-parser"); 
 
+dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(express.json());
+<<<<<<< Updated upstream
 app.use(cors({
   origin: 'http://localhost:5173', // Adjust to match your frontend port
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
+=======
+app.use(cookieParser()); // Enable cookie parsing
+app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Allow frontend to send cookies
+
+connectDB();
+>>>>>>> Stashed changes
 
 // Routes
-const notificationRoutes = require('./routes/notifications');
-app.use('/api/notifications', notificationRoutes);
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/family", require("./routes/familyRoutes"));
+app.use("/api/items", require("./routes/itemRoutes"));
 
-// MongoDB Connection
-const connectionString = process.env.CONNECTION_STRING;
 
+<<<<<<< Updated upstream
 mongoose.connect(connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -35,10 +43,12 @@ mongoose.connect(connectionString, {
 const port = 7001;
 const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+=======
+app.get("/", (req, res) => {
+  res.send("Social Media Authentication API Running");
+>>>>>>> Stashed changes
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err.message);
-  server.close(() => process.exit(1));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
