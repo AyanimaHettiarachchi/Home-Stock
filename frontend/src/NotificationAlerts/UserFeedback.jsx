@@ -194,173 +194,213 @@ function UserFeedback() {
           </div>
         </header>
 
-        <main className="flex-1 px-4 md:px-6 py-10 flex items-center justify-center">
-          <motion.div
-            className="w-full max-w-lg bg-white/95 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-100"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {editingFeedback ? 'Edit Feedback' : 'Submit Feedback'}
-              </h1>
-              <Link to="/notification-and-expiry-alerts" className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
-                Back
-              </Link>
-            </motion.div>
-
-            {error && (
-              <motion.p
-                className="text-red-600 bg-red-50 p-3 rounded-lg mb-6 font-medium"
-                variants={itemVariants}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+        <main className="flex-1 px-4 md:px-6 py-10">
+          <div className="max-w-7xl mx-auto relative">
+            <div className="flex flex-col lg:flex-row lg:space-x-16">
+              {/* Left Side: Feedback Form */}
+              <motion.div
+                className="w-full lg:w-1/2 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/30 z-10 lg:-mr-16"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
               >
-                {error}
-              </motion.p>
-            )}
-            {success && (
-              <motion.p
-                className="text-green-600 bg-green-50 p-3 rounded-lg mb-6 font-medium"
-                variants={itemVariants}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                {editingFeedback ? 'Feedback updated successfully!' : 'Feedback submitted successfully!'}
-              </motion.p>
-            )}
+                <motion.div className="flex justify-between items-center mb-8" variants={itemVariants}>
+                  <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                    {editingFeedback ? 'Edit Feedback' : 'Share Your Feedback'}
+                  </h1>
+                  <Link to="/notification-and-expiry-alerts" className="text-teal-300 hover:text-teal-200 text-sm font-medium transition-colors duration-300">
+                    Back
+                  </Link>
+                </motion.div>
 
-            {/* Feedback Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Your Name</label>
-                <input
-                  type="text"
-                  value={formData.userName}
-                  onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                  placeholder="Enter your name"
-                  required
-                />
-              </motion.div>
+                {error && (
+                  <motion.p
+                    className="text-red-300 bg-red-900/30 p-3 rounded-lg mb-6 font-medium border border-red-500/40 shadow-sm"
+                    variants={itemVariants}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    {error}
+                  </motion.p>
+                )}
+                {success && (
+                  <motion.p
+                    className="text-green-300 bg-green-900/30 p-3 rounded-lg mb-6 font-medium border border-green-500/40 shadow-sm"
+                    variants={itemVariants}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    {editingFeedback ? 'Feedback updated successfully!' : 'Feedback submitted successfully!'}
+                  </motion.p>
+                )}
 
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                  placeholder="Enter your phone number (e.g., +1234567890)"
-                  required
-                />
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Feedback Message</label>
-                <textarea
-                  value={formData.feedbackMessage}
-                  onChange={(e) => setFormData({ ...formData, feedbackMessage: e.target.value })}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                  placeholder="Enter your feedback"
-                  rows="4"
-                  required
-                />
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Rating</label>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FaStar
-                      key={star}
-                      size={24}
-                      className={`cursor-pointer transition-colors duration-200 ${
-                        star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                      onClick={() => setFormData({ ...formData, rating: star })}
+                {/* Feedback Form */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <motion.div variants={itemVariants}>
+                    <label className="block text-sm font-semibold text-gray-100 mb-2">Your Name</label>
+                    <input
+                      type="text"
+                      value={formData.userName}
+                      onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                      className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all duration-300 text-white placeholder-gray-400 shadow-sm"
+                      placeholder="Enter your name"
+                      required
                     />
-                  ))}
-                </div>
-              </motion.div>
+                  </motion.div>
 
-              <motion.button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold"
-                variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {editingFeedback ? 'Update Feedback' : 'Submit Feedback'}
-              </motion.button>
-              {editingFeedback && (
-                <motion.button
-                  type="button"
-                  onClick={() => {
-                    setEditingFeedback(null);
-                    setFormData({ userName: '', phoneNumber: '', feedbackMessage: '', rating: 0 });
-                  }}
-                  className="w-full bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition-all duration-300 font-semibold"
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cancel Edit
-                </motion.button>
-              )}
-            </form>
+                  <motion.div variants={itemVariants}>
+                    <label className="block text-sm font-semibold text-gray-100 mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all duration-300 text-white placeholder-gray-400 shadow-sm"
+                      placeholder="Enter your phone number (e.g., +1234567890)"
+                      required
+                    />
+                  </motion.div>
 
-            {/* Feedback List */}
-            {feedbackList.length > 0 && (
-              <motion.div className="mt-10" variants={itemVariants}>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Feedback</h2>
-                <div className="space-y-4">
-                  {feedbackList.map((feedback) => (
-                    <motion.div
-                      key={feedback._id}
-                      className="bg-gray-50 p-4 rounded-lg shadow-md"
+                  <motion.div variants={itemVariants}>
+                    <label className="block text-sm font-semibold text-gray-100 mb-2">Feedback Message</label>
+                    <textarea
+                      value={formData.feedbackMessage}
+                      onChange={(e) => setFormData({ ...formData, feedbackMessage: e.target.value })}
+                      className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all duration-300 text-white placeholder-gray-400 shadow-sm"
+                      placeholder="Enter your feedback"
+                      rows="4"
+                      required
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <label className="block text-sm font-semibold text-gray-100 mb-2">Rating</label>
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FaStar
+                          key={star}
+                          size={24}
+                          className={`cursor-pointer transition-colors duration-200 ${
+                            star <= formData.rating ? 'text-yellow-300' : 'text-gray-500'
+                          } hover:text-yellow-200`}
+                          onClick={() => setFormData({ ...formData, rating: star })}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  <motion.button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-3 rounded-lg hover:from-teal-600 hover:to-cyan-600 transition-all duration-300 font-semibold shadow-lg"
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {editingFeedback ? 'Update Feedback' : 'Submit Feedback'}
+                  </motion.button>
+                  {editingFeedback && (
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        setEditingFeedback(null);
+                        setFormData({ userName: '', phoneNumber: '', feedbackMessage: '', rating: 0 });
+                      }}
+                      className="w-full bg-gray-700 text-white p-3 rounded-lg hover:bg-gray-800 transition-all duration-300 font-semibold shadow-lg"
                       variants={itemVariants}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center">
-                          <span className="font-semibold text-gray-800 mr-2">{feedback.userName}</span>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <FaStar
-                                key={star}
-                                size={16}
-                                className={star <= feedback.rating ? 'text-yellow-400' : 'text-gray-300'}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="space-x-2">
-                          <button
-                            onClick={() => handleEdit(feedback)}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(feedback._id)}
-                            className="text-red-600 hover:text-red-800 text-sm font-medium"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 text-sm mb-1">Phone: {feedback.phoneNumber}</p>
-                      <p className="text-gray-600">{feedback.feedbackMessage}</p>
-                      <p className="text-gray-500 text-xs mt-2">
-                        Submitted on: {new Date(feedback.createdAt).toLocaleString()}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
+                      Cancel Edit
+                    </motion.button>
+                  )}
+                </form>
               </motion.div>
-            )}
-          </motion.div>
+
+              {/* Right Side: Feedback List */}
+              <div className="w-full lg:w-2/3 bg-gradient-to-br from-gray-900/30 to-gray-900/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-gray-700/30 lg:ml-32 mt-8 lg:mt-0">
+                {feedbackList.length > 0 && (
+                  <motion.div
+                    className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-teal-600 scrollbar-track-gray-900"
+                    variants={containerVariants}
+                  >
+                    <div className="sticky top-0 bg-gradient-to-r from-gray-900/90 to-gray-900/70 backdrop-blur-md p-4 rounded-t-lg shadow-md z-10">
+                      <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400 drop-shadow-lg">
+                        What Users Are Saying
+                      </h2>
+                    </div>
+                    <div className="space-y-4 p-4">
+                      {feedbackList.map((feedback) => (
+                        <motion.div
+                          key={feedback._id}
+                          className="bg-gray-900/50 backdrop-blur-md p-4 rounded-lg shadow-md border border-gray-700/40 hover:shadow-xl hover:bg-gray-900/70 transition-all duration-300"
+                          variants={itemVariants}
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <div className="flex items-center">
+                              <span className="font-semibold text-teal-100 mr-2">{feedback.userName}</span>
+                              <div className="flex">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <FaStar
+                                    key={star}
+                                    size={16}
+                                    className={star <= feedback.rating ? 'text-yellow-300' : 'text-gray-500'}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="space-x-2">
+                              <button
+                                onClick={() => handleEdit(feedback)}
+                                className="text-teal-300 hover:text-teal-200 text-sm font-medium transition-colors duration-300"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(feedback._id)}
+                                className="text-red-300 hover:text-red-200 text-sm font-medium transition-colors duration-300"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-gray-300 text-sm mb-1">Phone: {feedback.phoneNumber}</p>
+                          <p className="text-gray-200">{feedback.feedbackMessage}</p>
+                          <p className="text-gray-400 text-xs mt-2">
+                            Submitted on: {new Date(feedback.createdAt).toLocaleString()}
+                          </p>
+                        </motion.div>
+                      ))}
+                    </div>
+                    {/* Generate Report Button Moved Here */}
+                    <motion.div className="p-4" variants={itemVariants}>
+                      <Link
+                        to="/feedback-report"
+                        className="block w-full text-center bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-3 rounded-lg hover:from-teal-600 hover:to-cyan-600 transition-all duration-300 font-semibold shadow-lg"
+                      >
+                        Generate Report
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+                )}
+                {feedbackList.length === 0 && (
+                  <motion.div
+                    className="bg-gray-900/50 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-gray-700/40 text-center"
+                    variants={itemVariants}
+                  >
+                    <p className="text-gray-300 text-lg">No feedback yet. Share your thoughts to get started!</p>
+                    {/* Generate Report Button for Empty State */}
+                    <motion.div className="mt-4" variants={itemVariants}>
+                      <Link
+                        to="/feedback-report"
+                        className="block w-full text-center bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-3 rounded-lg hover:from-teal-600 hover:to-cyan-600 transition-all duration-300 font-semibold shadow-lg"
+                      >
+                        Generate Report
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
         </main>
 
         <footer className="w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
