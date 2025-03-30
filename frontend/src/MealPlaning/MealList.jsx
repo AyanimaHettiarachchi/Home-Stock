@@ -1,3 +1,4 @@
+// frontend/src/MealPlaning/MealList.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
@@ -38,12 +39,15 @@ const generateMealId = () => {
 
 export default function MealList() {
   const [meals, setMeals] = useState([]);
+  const [filteredMeals, setFilteredMeals] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingMeal, setEditingMeal] = useState(null);
   const [userNameError, setUserNameError] = useState("");
+  const [emailError, setEmailError] = useState(""); // Still needed for submission error
+  const [extraIngredientsError, setExtraIngredientsError] = useState("");
   const [formError, setFormError] = useState("");
 
-  // Get today's date in YYYY-MM-DD format
   const today = new Date();
   const todayFormatted = today.toISOString().split("T")[0];
 
@@ -65,6 +69,7 @@ export default function MealList() {
       .get("http://localhost:7001/api/meals")
       .then((res) => {
         setMeals(res.data);
+        setFilteredMeals(res.data);
       })
       .catch((err) => {
         console.error("Error fetching meals:", err);
@@ -72,7 +77,223 @@ export default function MealList() {
       });
   }, []);
 
-  // Validate user name (only letters and spaces allowed)
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    if (query === "") {
+      setFilteredMeals(meals);
+    } else {
+      const filtered = meals.filter((meal) =>
+        (meal.userName || "").toLowerCase().includes(query)
+      );
+      setFilteredMeals(filtered);
+    }
+  };
+
+  const generateReport = () => {
+    if (!searchQuery || filteredMeals.length === 0) {
+      setFormError("No meals found for the searched user name. Please search for a valid user.");
+      return;
+    }
+
+    const userName = filteredMeals[0].userName;
+    const totalCalories = filteredMeals.reduce((sum, meal) => sum + Number(meal.calories), 0);
+    const averageCalories = filteredMeals.length > 0 ? (totalCalories / filteredMeals.length).toFixed(1) : 0;
+
+    const calorieRanges = {
+      "0-200": 0,
+      "201-400": 0,
+      "401-600": 0,
+      "601-800": 0,
+      "801+": 0,
+    };
+
+    filteredMeals.forEach((meal) => {
+      const calories = Number(meal.calories);
+      if (calories <= 200) calorieRanges["0-200"]++;
+      else if (calories <= 400) calorieRanges["201-400"]++;
+      else if (calories <= 600) calorieRanges["401-600"]++;
+      else if (calories <= 800) calorieRanges["601-800"]++;
+      else calorieRanges["801+"]++;
+    });
+
+    const tableRows = filteredMeals.map((meal) => `
+      <tr>
+        <td>${meal.mealId || "N/A"}</td>
+        <td>${meal.userName || "N/A"}</td>
+        <td>${meal.email || "N/A"}</td>
+        <td>${meal.mealName}</td>
+        <td>${meal.mealType}</td>
+        <td>${meal.calories}</td>
+        <td>${meal.ingredients.replace(/, /g, '<br>')}</td>
+        <td>${meal.day}</td>
+      </tr>
+    `).join("");
+
+    const now = new Date();
+    const generatedOn = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString()}`;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meal Report for ${userName}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+          }
+          .container {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+          }
+          .header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+          }
+          .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+          }
+          .header h2 {
+            font-size: 18px;
+            margin: 5px 0;
+          }
+          .summary {
+            margin-bottom: 20px;
+          }
+          .summary h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+          .summary p {
+            font-size: 14px;
+            margin: 5px 0;
+          }
+          .meal-entries h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+          }
+          th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+          }
+          .footer {
+            text-align: left;
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            position: fixed;
+            bottom: 20px;
+            width: 760px;
+          }
+          .footer img {
+            width: 30px;
+            height: 30px;
+            vertical-align: middle;
+            margin-right: 5px;
+          }
+          .footer .right {
+            float: right;
+          }
+          @media print {
+            .footer {
+              position: fixed;
+              bottom: 0;
+            }
+          }
+        </style>
+      </head>
+      <body onload="window.print()">
+        <div class="container">
+          <div class="header">
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png" alt="Home Stock Logo">
+            <div>
+              <h1>Home Stock</h1>
+              <h2>Meal Report</h2>
+            </div>
+          </div>
+
+          <div class="summary">
+            <h4>Summary</h4>
+            <p>Total Meals: ${filteredMeals.length}</p>
+            <p>Average Calories: ${averageCalories}</p>
+            <p>Calories Breakdown:</p>
+            <p>0-200: ${calorieRanges["0-200"]}</p>
+            <p>201-400: ${calorieRanges["201-400"]}</p>
+            <p>401-600: ${calorieRanges["401-600"]}</p>
+            <p>601-800: ${calorieRanges["601-800"]}</p>
+            <p>801+: ${calorieRanges["801+"]}</p>
+          </div>
+
+          <div class="meal-entries">
+            <h4>All Meal Entries</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Meal ID</th>
+                  <th>User Name</th>
+                  <th>Email</th>
+                  <th>Meal Name</th>
+                  <th>Meal Type</th>
+                  <th>Calories</th>
+                  <th>Ingredients</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="footer">
+            <p><img src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png" alt="Home Stock Logo"> Home Stock</p>
+            <p>Address: 64/ Main Street, Colombo - 10</p>
+            <p>Phone: +94 (70) 5346902 | Email: support@homestock.com</p>
+            <p>Website: www.homestock.com</p>
+            <p>Generated On: ${generatedOn}</p>
+            <p class="right">Page 1 of 1</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(htmlContent);
+    newWindow.document.close();
+
+    setFormError("");
+  };
+
   const validateUserName = (value) => {
     const userNameRegex = /^[A-Za-z\s]*$/;
     if (!userNameRegex.test(value)) {
@@ -83,9 +304,8 @@ export default function MealList() {
     return true;
   };
 
-  // Validate meal ID (exactly 4 digits)
   const validateMealId = (value) => {
-    const mealIdRegex = /^\d{4}$/; // Exactly 4 digits
+    const mealIdRegex = /^\d{4}$/;
     if (!mealIdRegex.test(value)) {
       setFormError("Meal ID must be exactly 4 digits (e.g., 0001).");
       return false;
@@ -93,22 +313,38 @@ export default function MealList() {
     return true;
   };
 
-  // Handle user name input change
+  // Modified validateEmail to only return boolean, no error setting
+  const validateEmail = (value) => {
+    return value.includes('@');
+  };
+
   const handleUserNameChange = (e) => {
     const value = e.target.value;
     setNewMeal({ ...newMeal, userName: value });
     validateUserName(value);
   };
 
-  // Handle meal type change
+  // Modified handleEmailChange to not trigger validation or set error
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setNewMeal({ ...newMeal, email: value });
+    setEmailError(""); // Clear error while typing
+  };
+
+  const handleExtraIngredientsChange = (e) => {
+    const value = e.target.value;
+    setExtraIngredients(value);
+    validateExtraIngredients(value);
+  };
+
   const handleMealTypeChange = (e) => {
     const mealType = e.target.value;
     setNewMeal({ ...newMeal, mealType, mealName: "", calories: "", ingredients: "" });
     setSelectedMeal("");
     setExtraIngredients("");
+    setExtraIngredientsError("");
   };
 
-  // Handle meal selection from dropdown
   const handleMealSelection = (e) => {
     const selected = e.target.value;
     const mealData = mealOptions[newMeal.mealType].find((meal) => meal.name === selected);
@@ -121,9 +357,11 @@ export default function MealList() {
       });
       setSelectedMeal(selected);
       setExtraIngredients("");
+      setExtraIngredientsError("");
     }
   };
 
+  // Updated handleSaveMeal to set email error only on submission
   const handleSaveMeal = async () => {
     if (!newMeal.mealName) {
       setFormError("Please select a meal.");
@@ -135,6 +373,15 @@ export default function MealList() {
     }
 
     if (!validateMealId(newMeal.mealId)) {
+      return;
+    }
+
+    if (!validateEmail(newMeal.email)) {
+      setEmailError("Email must contain an @ symbol.");
+      return;
+    }
+
+    if (!validateExtraIngredients(extraIngredients)) {
       return;
     }
 
@@ -155,10 +402,14 @@ export default function MealList() {
           `http://localhost:7001/api/meals/${editingMeal._id}`,
           mealToSave
         );
-        setMeals(meals.map((meal) => (meal._id === editingMeal._id ? res.data : meal)));
+        const updatedMeals = meals.map((meal) => (meal._id === editingMeal._id ? res.data : meal));
+        setMeals(updatedMeals);
+        setFilteredMeals(updatedMeals);
       } else {
         const res = await axios.post("http://localhost:7001/api/meals", mealToSave);
-        setMeals([...meals, res.data]);
+        const updatedMeals = [...meals, res.data];
+        setMeals(updatedMeals);
+        setFilteredMeals(updatedMeals);
       }
       setShowForm(false);
       setNewMeal({
@@ -174,6 +425,8 @@ export default function MealList() {
       setSelectedMeal("");
       setExtraIngredients("");
       setUserNameError("");
+      setEmailError(""); // Clear email error after successful save
+      setExtraIngredientsError("");
       setFormError("");
       setEditingMeal(null);
     } catch (err) {
@@ -185,7 +438,9 @@ export default function MealList() {
   const handleDeleteMeal = async (id) => {
     try {
       await axios.delete(`http://localhost:7001/api/meals/${id}`);
-      setMeals(meals.filter((meal) => meal._id !== id));
+      const updatedMeals = meals.filter((meal) => meal._id !== id);
+      setMeals(updatedMeals);
+      setFilteredMeals(updatedMeals);
       setFormError("");
     } catch (err) {
       console.error("Error deleting meal:", err);
@@ -224,7 +479,7 @@ export default function MealList() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                `text-white text-sm md:text-lg hover:text-purple-300 transition-Colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
               }
             >
               Home
@@ -277,10 +532,34 @@ export default function MealList() {
                 day: todayFormatted,
               });
               setFormError("");
+              setEmailError("");
+              setExtraIngredientsError("");
             }}
             className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors duration-300 shadow-md"
           >
             + Add New Meal
+          </button>
+        </div>
+
+        {/* Search Bar and Generate Report Button */}
+        <div className="mb-6 flex items-center space-x-4">
+          <input
+            type="text"
+            placeholder="Search meals by user name..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-white text-gray-700 placeholder-gray-400"
+          />
+          <button
+            onClick={generateReport}
+            disabled={!searchQuery || filteredMeals.length === 0}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 shadow-md ${
+              !searchQuery || filteredMeals.length === 0
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-green-500 text-white hover:bg-green-600"
+            }`}
+          >
+            Generate Report
           </button>
         </div>
 
@@ -308,49 +587,59 @@ export default function MealList() {
               </tr>
             </thead>
             <tbody>
-              {meals.map((meal) => (
-                <tr key={meal._id} className="border-b hover:bg-gray-50 transition-colors duration-200">
-                  <td className="p-4 text-gray-600">{meal.mealId || "N/A"}</td>
-                  <td className="p-4 text-gray-600">{meal.userName || "N/A"}</td>
-                  <td className="p-4 text-gray-600">{meal.email || "N/A"}</td>
-                  <td className="p-4 text-gray-600">{meal.mealName}</td>
-                  <td className="p-4 text-gray-600">{meal.mealType}</td>
-                  <td className="p-4 text-gray-600">{meal.calories}</td>
-                  <td className="p-4 text-gray-600">{meal.ingredients}</td>
-                  <td className="p-4 text-gray-600">{meal.day}</td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => {
-                        setNewMeal(meal);
-                        setEditingMeal(meal);
-                        setSelectedMeal(meal.mealName);
-                        const mealData = mealOptions[meal.mealType].find((m) => m.name === meal.mealName);
-                        if (mealData) {
-                          const basic = mealData.basicIngredients.join(", ");
-                          const extra = meal.ingredients
-                            .split(", ")
-                            .filter((ing) => !mealData.basicIngredients.includes(ing))
-                            .join(", ");
-                          setExtraIngredients(extra);
-                        } else {
-                          setExtraIngredients(meal.ingredients);
-                        }
-                        setShowForm(true);
-                        setFormError("");
-                      }}
-                      className="text-blue-500 hover:text-blue-700 transition-colors duration-300 font-medium"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteMeal(meal._id)}
-                      className="text-red-500 ml-4 hover:text-red-700 transition-colors duration-300 font-medium"
-                    >
-                      Delete
-                    </button>
+              {filteredMeals.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="p-4 text-center text-gray-600">
+                    No meals found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredMeals.map((meal) => (
+                  <tr key={meal._id} className="border-b hover:bg-gray-50 transition-colors duration-200">
+                    <td className="p-4 text-gray-600">{meal.mealId || "N/A"}</td>
+                    <td className="p-4 text-gray-600">{meal.userName || "N/A"}</td>
+                    <td className="p-4 text-gray-600">{meal.email || "N/A"}</td>
+                    <td className="p-4 text-gray-600">{meal.mealName}</td>
+                    <td className="p-4 text-gray-600">{meal.mealType}</td>
+                    <td className="p-4 text-gray-600">{meal.calories}</td>
+                    <td className="p-4 text-gray-600">{meal.ingredients}</td>
+                    <td className="p-4 text-gray-600">{meal.day}</td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => {
+                          setNewMeal(meal);
+                          setEditingMeal(meal);
+                          setSelectedMeal(meal.mealName);
+                          const mealData = mealOptions[meal.mealType].find((m) => m.name === meal.mealName);
+                          if (mealData) {
+                            const basic = mealData.basicIngredients.join(", ");
+                            const extra = meal.ingredients
+                              .split(", ")
+                              .filter((ing) => !mealData.basicIngredients.includes(ing))
+                              .join(", ");
+                            setExtraIngredients(extra);
+                          } else {
+                            setExtraIngredients(meal.ingredients);
+                          }
+                          setShowForm(true);
+                          setFormError("");
+                          setEmailError("");
+                          setExtraIngredientsError("");
+                        }}
+                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300 font-medium"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMeal(meal._id)}
+                        className="text-red-500 ml-4 hover:text-red-700 transition-colors duration-300 font-medium"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -359,12 +648,12 @@ export default function MealList() {
         {showForm && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
             <div
-              className="p-6 rounded-2xl shadow-2xl w-full max-w-lg backdrop-blur-sm" // Changed max-w-md to max-w-lg
+              className="p-6 rounded-2xl shadow-2xl w-full max-w-lg backdrop-blur-sm"
               style={{
                 backgroundImage: `url('https://img.freepik.com/free-photo/couple-eating-salad-browsing-streaming-service-site_23-2147930585.jpg?t=st=1742719923~exp=1742723523~hmac=ac3e6578241d0ceb0c290a8be42f8c547f2cdcff7bd415efd137c60c32670e4d&w=740')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light overlay for readability
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 backgroundBlendMode: 'overlay',
               }}
             >
@@ -373,7 +662,6 @@ export default function MealList() {
               </h3>
 
               <div className="space-y-4">
-                {/* Meal ID Field (Read-Only) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Meal ID</label>
                   <input
@@ -404,9 +692,14 @@ export default function MealList() {
                     type="email"
                     placeholder="Email"
                     value={newMeal.email}
-                    onChange={(e) => setNewMeal({ ...newMeal, email: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    onChange={handleEmailChange}
+                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
+                      emailError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                    }`}
                   />
+                  {emailError && (
+                    <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Meal Type</label>
@@ -462,10 +755,15 @@ export default function MealList() {
                   <textarea
                     placeholder="Add extra ingredients (comma separated)"
                     value={extraIngredients}
-                    onChange={(e) => setExtraIngredients(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    onChange={handleExtraIngredientsChange}
+                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
+                      extraIngredientsError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                    }`}
                     rows="2"
                   />
+                  {extraIngredientsError && (
+                    <p className="text-red-500 text-xs mt-1">{extraIngredientsError}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -495,6 +793,8 @@ export default function MealList() {
                     setSelectedMeal("");
                     setExtraIngredients("");
                     setUserNameError("");
+                    setEmailError("");
+                    setExtraIngredientsError("");
                     setFormError("");
                     setEditingMeal(null);
                   }}
@@ -536,7 +836,6 @@ export default function MealList() {
               Privacy Policy
             </a>
           </div>
-          <p className="text-gray-400 text-xs md:text-sm">Powered by xAI</p>
         </div>
       </footer>
     </div>

@@ -10,7 +10,8 @@ import MealList from './MealPlaning/MealList';
 import MealPlanningDashboard from './MealPlaning/MealPlanningDashboard';
 import NutritionPage from './MealPlaning/NutritionPage';
 import RecipesPage from './MealPlaning/RecipesPage';
-import BulkMealPlanning from './MealPlaning/BulkMealPlanning'; // New import
+import BulkMealPlanning from './MealPlaning/BulkMealPlanning';
+import MealPlanDetails from './MealPlaning/MealPlanDetails'; // New import
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
         <Route path="/meal-planning-dashboard" element={<MealPlanningDashboard />} />
         <Route path="/nutrition" element={<NutritionPage />} />
         <Route path="/recipes" element={<RecipesPage />} />
-        <Route path="/bulk-meal-planning" element={<BulkMealPlanning />} /> {/* Updated route */}
+        <Route path="/bulk-meal-planning" element={<BulkMealPlanning />} />
+        <Route path="/meal-plan-details/:id" element={<MealPlanDetails />} /> {/* New route */}
       </Routes>
     </BrowserRouter>
   );

@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,11 +16,12 @@ app.use(cors({
 
 // Routes
 const notificationRoutes = require('./routes/notifications'); // Assuming this exists
-const mealRoutes = require('./routes/mealRoutes');
+const mealRoutes = require('./routes/mealRoutes'); // Assuming this exists
+const mealPlansRouter = require('./routes/mealPlans'); // Add this line
 
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/meals', mealRoutes);
-
+app.use('/api/meal-plans', mealPlansRouter); // Add this line
 
 // MongoDB Connection
 const connectionString = process.env.CONNECTION_STRING;
