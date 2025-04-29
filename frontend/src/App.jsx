@@ -30,6 +30,8 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/notification-settings" element={<NotificationSettings />} />
         <Route path="/notification-history" element={<NotificationHistory />} />
+        <Route path="/user-message-form" element={<UserFeedback />} />
+        <Route path="/feedback-report" element={<FeedbackReport />} />
         <Route path="/MealList" element={<MealList />} />
         <Route path="/meal-planning-dashboard" element={<MealPlanningDashboard />} />
         <Route path="/nutrition" element={<NutritionPage />} />
