@@ -1,9 +1,8 @@
-// frontend/src/MealPlaning/MealList.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
+import jsPDF from 'jspdf';
 
-// Predefined meals for each meal type with basic ingredients
 const mealOptions = {
   Breakfast: [
     { name: "Oatmeal with Berries", calories: 200, basicIngredients: ["oats", "berries", "milk", "honey"] },
@@ -31,10 +30,9 @@ const mealOptions = {
   ],
 };
 
-// Function to generate a 4-digit meal ID (e.g., 0001 to 9999)
 const generateMealId = () => {
-  const randomNum = Math.floor(Math.random() * 10000); // Generate a number between 0 and 9999
-  return randomNum.toString().padStart(4, '0'); // Pad with leading zeros to ensure 4 digits
+  const randomNum = Math.floor(Math.random() * 10000);
+  return randomNum.toString().padStart(4, '0');
 };
 
 export default function MealList() {
@@ -44,7 +42,7 @@ export default function MealList() {
   const [showForm, setShowForm] = useState(false);
   const [editingMeal, setEditingMeal] = useState(null);
   const [userNameError, setUserNameError] = useState("");
-  const [emailError, setEmailError] = useState(""); // Still needed for submission error
+  const [emailError, setEmailError] = useState("");
   const [extraIngredientsError, setExtraIngredientsError] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -118,179 +116,180 @@ export default function MealList() {
       else calorieRanges["801+"]++;
     });
 
-    const tableRows = filteredMeals.map((meal) => `
-      <tr>
-        <td>${meal.mealId || "N/A"}</td>
-        <td>${meal.userName || "N/A"}</td>
-        <td>${meal.email || "N/A"}</td>
-        <td>${meal.mealName}</td>
-        <td>${meal.mealType}</td>
-        <td>${meal.calories}</td>
-        <td>${meal.ingredients.replace(/, /g, '<br>')}</td>
-        <td>${meal.day}</td>
-      </tr>
-    `).join("");
+    const doc = new jsPDF();
 
-    const now = new Date();
-    const generatedOn = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString()}`;
+    // Add Logo (Placeholder)
+    // Replace the line below with your base64-encoded logo string
+    // Example: const logoBase64 = "data:image/png;base64,iVBORw0KGgo...";
+    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
+    // You need to provide the base64 string for your logo
+    // For now, I'll comment this out since I don't have the logo
+    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
 
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Meal Report for ${userName}</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-          }
-          .container {
-            max-width: 800px;
-            margin: 0 auto;
-          }
-          .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-          }
-          .header img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-          }
-          .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0;
-          }
-          .header h2 {
-            font-size: 18px;
-            margin: 5px 0;
-          }
-          .summary {
-            margin-bottom: 20px;
-          }
-          .summary h4 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
-          .summary p {
-            font-size: 14px;
-            margin: 5px 0;
-          }
-          .meal-entries h4 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            font-size: 12px;
-          }
-          th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          .footer {
-            text-align: left;
-            font-size: 12px;
-            color: #555;
-            margin-top: 20px;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            position: fixed;
-            bottom: 20px;
-            width: 760px;
-          }
-          .footer img {
-            width: 30px;
-            height: 30px;
-            vertical-align: middle;
-            margin-right: 5px;
-          }
-          .footer .right {
-            float: right;
-          }
-          @media print {
-            .footer {
-              position: fixed;
-              bottom: 0;
-            }
-          }
-        </style>
-      </head>
-      <body onload="window.print()">
-        <div class="container">
-          <div class="header">
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png" alt="Home Stock Logo">
-            <div>
-              <h1>Home Stock</h1>
-              <h2>Meal Report</h2>
-            </div>
-          </div>
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(0, 102, 204);
+    doc.setFont("helvetica", "bold");
+    doc.text("Home Stock", 20, 20);
+    doc.setFontSize(18);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    doc.text("Meal Report", 20, 32);
 
-          <div class="summary">
-            <h4>Summary</h4>
-            <p>Total Meals: ${filteredMeals.length}</p>
-            <p>Average Calories: ${averageCalories}</p>
-            <p>Calories Breakdown:</p>
-            <p>0-200: ${calorieRanges["0-200"]}</p>
-            <p>201-400: ${calorieRanges["201-400"]}</p>
-            <p>401-600: ${calorieRanges["401-600"]}</p>
-            <p>601-800: ${calorieRanges["601-800"]}</p>
-            <p>801+: ${calorieRanges["801+"]}</p>
-          </div>
+    // Summary Section
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary", 20, 50);
 
-          <div class="meal-entries">
-            <h4>All Meal Entries</h4>
-            <table>
-              <thead>
-                <tr>
-                  <th>Meal ID</th>
-                  <th>User Name</th>
-                  <th>Email</th>
-                  <th>Meal Name</th>
-                  <th>Meal Type</th>
-                  <th>Calories</th>
-                  <th>Ingredients</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
-          </div>
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total Meals: ${filteredMeals.length}`, 20, 60);
+    doc.text(`Average Calories: ${averageCalories}/Meal`, 70, 60);
+    doc.text("Calories Breakdown:", 120, 60);
+    doc.text(`0-200: ${calorieRanges["0-200"]}`, 130, 70);
+    doc.text(`201-400: ${calorieRanges["201-400"]}`, 130, 80);
+    doc.text(`401-600: ${calorieRanges["401-600"]}`, 130, 90);
+    doc.text(`601-800: ${calorieRanges["601-800"]}`, 130, 100);
+    doc.text(`801+: ${calorieRanges["801+"]}`, 130, 110);
 
-          <div class="footer">
-            <p><img src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png" alt="Home Stock Logo"> Home Stock</p>
-            <p>Address: 64/ Main Street, Colombo - 10</p>
-            <p>Phone: +94 (70) 5346902 | Email: support@homestock.com</p>
-            <p>Website: www.homestock.com</p>
-            <p>Generated On: ${generatedOn}</p>
-            <p class="right">Page 1 of 1</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    // Table of Meal Entries (Centered)
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    const tableWidth = 190; // New table width to fit within margins
+    const pageWidth = 210; // A4 page width
+    const margin = (pageWidth - tableWidth) / 2; // Center the table
+    const tableStartX = margin; // Starting x position (10)
 
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(htmlContent);
-    newWindow.document.close();
+    doc.text("All Meal Entries", tableStartX, 130); // Center the title with the table
 
+    // Table Headers with Background and Borders
+    doc.setFontSize(10);
+    doc.setTextColor(0, 102, 204);
+    doc.setFillColor(240, 240, 240);
+    doc.rect(tableStartX, 135, tableWidth, 10, "F"); // Background for header row
+    doc.setDrawColor(0, 0, 0);
+
+    // Define column widths and positions
+    const colWidths = {
+      mealId: 15,
+      userName: 23,
+      email: 23,
+      mealName: 23,
+      mealType: 23,
+      calories: 15,
+      ingredients: 38,
+      date: 30,
+    };
+
+    let xPos = tableStartX;
+    doc.rect(xPos, 135, colWidths.mealId, 10); // Meal ID
+    xPos += colWidths.mealId;
+    doc.rect(xPos, 135, colWidths.userName, 10); // User Name
+    xPos += colWidths.userName;
+    doc.rect(xPos, 135, colWidths.email, 10); // Email
+    xPos += colWidths.email;
+    doc.rect(xPos, 135, colWidths.mealName, 10); // Meal Name
+    xPos += colWidths.mealName;
+    doc.rect(xPos, 135, colWidths.mealType, 10); // Meal Type
+    xPos += colWidths.mealType;
+    doc.rect(xPos, 135, colWidths.calories, 10); // Calories
+    xPos += colWidths.calories;
+    doc.rect(xPos, 135, colWidths.ingredients, 10); // Ingredients
+    xPos += colWidths.ingredients;
+    doc.rect(xPos, 135, colWidths.date, 10); // Date
+
+    let yPos = 142;
+    xPos = tableStartX;
+    doc.text("Meal ID", xPos + 2, yPos);
+    xPos += colWidths.mealId;
+    doc.text("User Name", xPos + 2, yPos);
+    xPos += colWidths.userName;
+    doc.text("Email", xPos + 2, yPos);
+    xPos += colWidths.email;
+    doc.text("Meal Name", xPos + 2, yPos);
+    xPos += colWidths.mealName;
+    doc.text("Meal Type", xPos + 2, yPos);
+    xPos += colWidths.mealType;
+    doc.text("Calories", xPos + 2, yPos);
+    xPos += colWidths.calories;
+    doc.text("Ingredients", xPos + 2, yPos);
+    xPos += colWidths.ingredients;
+    doc.text("Date", xPos + 2, yPos);
+    yPos += 5;
+
+    // Table Rows with Alternating Background
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.setDrawColor(0, 0, 0);
+    const rowHeight = 15;
+    let rowIndex = 0;
+    filteredMeals.forEach((meal) => {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      // Alternating row background
+      if (rowIndex % 2 === 1) {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(tableStartX, yPos - 5, tableWidth, rowHeight, "F");
+      }
+      // Draw borders for each cell
+      xPos = tableStartX;
+      doc.rect(xPos, yPos - 5, colWidths.mealId, rowHeight); // Meal ID
+      xPos += colWidths.mealId;
+      doc.rect(xPos, yPos - 5, colWidths.userName, rowHeight); // User Name
+      xPos += colWidths.userName;
+      doc.rect(xPos, yPos - 5, colWidths.email, rowHeight); // Email
+      xPos += colWidths.email;
+      doc.rect(xPos, yPos - 5, colWidths.mealName, rowHeight); // Meal Name
+      xPos += colWidths.mealName;
+      doc.rect(xPos, yPos - 5, colWidths.mealType, rowHeight); // Meal Type
+      xPos += colWidths.mealType;
+      doc.rect(xPos, yPos - 5, colWidths.calories, rowHeight); // Calories
+      xPos += colWidths.calories;
+      doc.rect(xPos, yPos - 5, colWidths.ingredients, rowHeight); // Ingredients
+      xPos += colWidths.ingredients;
+      doc.rect(xPos, yPos - 5, colWidths.date, rowHeight); // Date
+
+      // Add text to each cell
+      const textYPos = yPos + (rowHeight / 2) - 2;
+      xPos = tableStartX;
+      doc.text(meal.mealId || "N/A", xPos + 2, textYPos);
+      xPos += colWidths.mealId;
+      doc.text((meal.userName || "N/A").substring(0, 10), xPos + 2, textYPos);
+      xPos += colWidths.userName;
+      doc.text((meal.email || "N/A").substring(0, 15), xPos + 2, textYPos);
+      xPos += colWidths.email;
+      doc.text(meal.mealName.substring(0, 15), xPos + 2, textYPos);
+      xPos += colWidths.mealName;
+      doc.text(meal.mealType.substring(0, 10), xPos + 2, textYPos);
+      xPos += colWidths.mealType;
+      doc.text(meal.calories.toString(), xPos + 2, textYPos);
+      xPos += colWidths.calories;
+      doc.text(meal.ingredients.substring(0, 25), xPos + 2, textYPos);
+      xPos += colWidths.ingredients;
+      doc.text(meal.day, xPos + 2, textYPos);
+      yPos += rowHeight;
+      rowIndex++;
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(0, 0, 0);
+      doc.line(20, doc.internal.pageSize.height - 40, 270, doc.internal.pageSize.height - 40);
+      doc.text("Home Stock", 20, doc.internal.pageSize.height - 30);
+      doc.text("Address: 64/ Main Street, Colombo - 10", 20, doc.internal.pageSize.height - 20);
+      doc.text("Phone: +94 (70) 5346902 | Email: support@homestock.com", 20, doc.internal.pageSize.height - 10);
+      doc.text("Website: www.homestock.com", 20, doc.internal.pageSize.height - 5);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
+    }
+
+    // Save the PDF
+    doc.save(`Meal_Report_${userName}_${todayFormatted}.pdf`);
     setFormError("");
   };
 
@@ -313,9 +312,27 @@ export default function MealList() {
     return true;
   };
 
-  // Modified validateEmail to only return boolean, no error setting
   const validateEmail = (value) => {
     return value.includes('@');
+  };
+
+  const validateExtraIngredients = (value) => {
+    if (value.trim() === "") {
+      setExtraIngredientsError("");
+      return true;
+    }
+    const ingredientsRegex = /^[A-Za-z0-9\s,]*$/;
+    if (!ingredientsRegex.test(value)) {
+      setExtraIngredientsError("Extra ingredients can only contain letters, numbers, spaces, and commas.");
+      return false;
+    }
+    const ingredientsArray = value.split(",").map(item => item.trim());
+    if (ingredientsArray.some(item => item === "")) {
+      setExtraIngredientsError("Extra ingredients cannot contain empty entries between commas.");
+      return false;
+    }
+    setExtraIngredientsError("");
+    return true;
   };
 
   const handleUserNameChange = (e) => {
@@ -324,11 +341,10 @@ export default function MealList() {
     validateUserName(value);
   };
 
-  // Modified handleEmailChange to not trigger validation or set error
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setNewMeal({ ...newMeal, email: value });
-    setEmailError(""); // Clear error while typing
+    setEmailError("");
   };
 
   const handleExtraIngredientsChange = (e) => {
@@ -361,7 +377,6 @@ export default function MealList() {
     }
   };
 
-  // Updated handleSaveMeal to set email error only on submission
   const handleSaveMeal = async () => {
     if (!newMeal.mealName) {
       setFormError("Please select a meal.");
@@ -425,7 +440,7 @@ export default function MealList() {
       setSelectedMeal("");
       setExtraIngredients("");
       setUserNameError("");
-      setEmailError(""); // Clear email error after successful save
+      setEmailError("");
       setExtraIngredientsError("");
       setFormError("");
       setEditingMeal(null);
@@ -460,7 +475,6 @@ export default function MealList() {
         backgroundBlendMode: 'overlay',
       }}
     >
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 md:px-6">
           <div className="flex items-center space-x-4">
@@ -512,7 +526,6 @@ export default function MealList() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 p-6 md:p-8">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">Meal Planning</h2>
@@ -541,7 +554,6 @@ export default function MealList() {
           </button>
         </div>
 
-        {/* Search Bar and Generate Report Button */}
         <div className="mb-6 flex items-center space-x-4">
           <input
             type="text"
@@ -559,18 +571,16 @@ export default function MealList() {
                 : "bg-green-500 text-white hover:bg-green-600"
             }`}
           >
-            Generate Report
+            Generate PDF Report
           </button>
         </div>
 
-        {/* Display form error if exists */}
         {formError && (
           <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
             {formError}
           </div>
         )}
 
-        {/* Table */}
         <div className="bg-white rounded-2xl shadow-lg overflow-x-auto">
           <table className="w-full min-w-max">
             <thead>
@@ -644,7 +654,6 @@ export default function MealList() {
           </table>
         </div>
 
-        {/* Form Modal with Increased Width */}
         {showForm && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
             <div
@@ -814,7 +823,6 @@ export default function MealList() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
           <div className="flex justify-center items-center space-x-3 mb-4">

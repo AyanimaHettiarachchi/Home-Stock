@@ -1,7 +1,7 @@
 import { NavLink, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-// Icons for each card
+// Icons for each card (unchanged)
 const DailyMealIcon = () => (
   <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -27,15 +27,15 @@ const RecipesIcon = () => (
 );
 
 export default function MealPlanningDashboard() {
-  // Animation variants for fade-in
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+    hover: { y: -10, transition: { duration: 0.3 } }, // Slide-up effect on hover
   };
 
   return (
@@ -50,7 +50,7 @@ export default function MealPlanningDashboard() {
         backgroundBlendMode: 'overlay',
       }}
     >
-      {/* Header */}
+      {/* Header (unchanged) */}
       <header className="sticky top-0 z-50 w-full bg-gray-900/30 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 md:px-6">
           <div className="flex items-center space-x-4">
@@ -66,36 +66,16 @@ export default function MealPlanningDashboard() {
             </h1>
           </div>
           <nav className="flex space-x-4 md:space-x-6">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
+            <NavLink to="/" className={({ isActive }) => `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`}>
               Home
             </NavLink>
-            <NavLink
-              to="/notification-and-expiry-alerts"
-              className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
+            <NavLink to="/notification-and-expiry-alerts" className={({ isActive }) => `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`}>
               Notifications
             </NavLink>
-            <NavLink
-              to="/meal-planning-dashboard"
-              className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
+            <NavLink to="/meal-planning-dashboard" className={({ isActive }) => `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`}>
               Meal Planning
             </NavLink>
-            <NavLink
-              to="/notification-settings"
-              className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
-              }
-            >
+            <NavLink to="/notification-settings" className={({ isActive }) => `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`}>
               Settings
             </NavLink>
           </nav>
@@ -104,12 +84,7 @@ export default function MealPlanningDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 px-4 md:px-6 py-10">
-        <motion.div
-          className="max-w-6xl mx-auto"
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-        >
+        <motion.div className="max-w-6xl mx-auto" initial="hidden" animate="visible" variants={fadeIn}>
           <h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-8 text-center">
             Meal Planning Dashboard
           </h2>
@@ -124,22 +99,22 @@ export default function MealPlanningDashboard() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ scale: 1.05 }}
-              className="bg-brown/30 backdrop-blur-md rounded-2xl shadow-lg p-6 flex flex-col items-center text-center min-h-80"
+              whileHover="hover"
+              className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center min-h-80 border border-gray-200 overflow-hidden"
             >
               <DailyMealIcon />
-              <h3 className="text-3xl font-semibold text-white mt-4 mb-2">Daily Meal Planning</h3>
-              <p className="text-white text-lg mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 mt-4 mb-2">Daily Meal Planning</h3>
+              <p className="text-gray-600 text-base mb-4">
                 Plan your meals for each day with a simple and intuitive interface.
               </p>
               <img
                 src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
                 alt="Daily Meal"
-                className="mt-4 w-full h-48 object-cover rounded-lg"
+                className="mt-4 w-full h-40 object-cover rounded-lg"
               />
               <Link
                 to="/MealList"
-                className="bg-gradient-to-r from-blue-900 to-blue-400 text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-950 hover:to-blue-500 transition-all duration-300 mt-4 shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-full text-base font-medium hover:from-blue-700 hover:to-blue-500 transition-all duration-300 mt-4 shadow-md hover:shadow-lg"
               >
                 Get Started
               </Link>
@@ -150,22 +125,22 @@ export default function MealPlanningDashboard() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-500/30 backdrop-blur-md rounded-2xl shadow-lg p-6 flex flex-col items-center text-center min-h-80"
+              whileHover="hover"
+              className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center min-h-80 border border-gray-200 overflow-hidden"
             >
               <BulkMealIcon />
-              <h3 className="text-3xl font-semibold text-white mt-4 mb-2">Bulk Meal Planning</h3>
-              <p className="text-white text-lg mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 mt-4 mb-2">Bulk Meal Planning</h3>
+              <p className="text-gray-600 text-base mb-4">
                 Plan multiple meals at once for the week or month ahead.
               </p>
               <img
                 src="https://img.freepik.com/free-photo/top-view-assortment-food-with-planner_23-2148484699.jpg?t=st=1742785105~exp=1742788705~hmac=8bf33891bfb6a071af0a400f727db1fd7e7d928a936f6edb81965aa91c4eb4ea&w=1380"
                 alt="Bulk Meal"
-                className="mt-4 w-full h-48 object-cover rounded-lg"
+                className="mt-4 w-full h-40 object-cover rounded-lg"
               />
               <Link
                 to="/bulk-meal-planning"
-                className="bg-gradient-to-r from-blue-900 to-blue-400 text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-950 hover:to-blue-500 transition-all duration-300 mt-4 shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-full text-base font-medium hover:from-blue-700 hover:to-blue-500 transition-all duration-300 mt-4 shadow-md hover:shadow-lg"
               >
                 Get Started
               </Link>
@@ -176,22 +151,22 @@ export default function MealPlanningDashboard() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ scale: 1.05 }}
-              className="bg-transparent/30 backdrop-blur-md rounded-3xl shadow-lg p-6 flex flex-col items-center text-center min-h-80"
+              whileHover="hover"
+              className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center min-h-80 border border-gray-200 overflow-hidden"
             >
               <NutritionIcon />
-              <h3 className="text-3xl font-semibold text-white mt-4 mb-2">Nutrition</h3>
-              <p className="text-white text-lg mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 mt-4 mb-2">Nutrition</h3>
+              <p className="text-gray-600 text-base mb-4">
                 Track the nutritional value of your meals and stay healthy.
               </p>
               <img
                 src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
                 alt="Nutrition"
-                className="mt-4 w-full h-48 object-cover rounded-lg"
+                className="mt-4 w-full h-40 object-cover rounded-lg"
               />
               <Link
                 to="/nutrition"
-                className="bg-gradient-to-r from-blue-900 to-blue-400 text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-950 hover:to-blue-500 transition-all duration-300 mt-12 shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-full text-base font-medium hover:from-blue-700 hover:to-blue-500 transition-all duration-300 mt-4 shadow-md hover:shadow-lg"
               >
                 Get Started
               </Link>
@@ -202,22 +177,22 @@ export default function MealPlanningDashboard() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-500/30 backdrop-blur-md rounded-2xl shadow-lg p-6 flex flex-col items-center text-center min-h-80"
+              whileHover="hover"
+              className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center min-h-80 border border-gray-200 overflow-hidden"
             >
               <RecipesIcon />
-              <h3 className="text-3xl font-semibold text-white mt-4 mb-2">Recipes</h3>
-              <p className="text-white text-lg mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 mt-4 mb-2">Recipes</h3>
+              <p className="text-gray-600 text-base mb-4">
                 Discover healthy and delicious recipes tailored to your diet.
               </p>
               <img
                 src="https://images.unsplash.com/photo-1606787620819-8bdf0c44c293?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
                 alt="Recipes"
-                className="mt-4 w-full h-48 object-cover rounded-lg"
+                className="mt-4 w-full h-40 object-cover rounded-lg"
               />
               <Link
                 to="/recipes"
-                className="bg-gradient-to-r from-blue-900 to-blue-400 text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-950 hover:to-blue-500 transition-all duration-300 mt-12 shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-full text-base font-medium hover:from-blue-700 hover:to-blue-500 transition-all duration-300 mt-4 shadow-md hover:shadow-lg"
               >
                 Get Started
               </Link>
@@ -226,7 +201,7 @@ export default function MealPlanningDashboard() {
         </motion.div>
       </main>
 
-      {/* Footer */}
+      {/* Footer (unchanged) */}
       <footer className="w-full bg-gray-900/30 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
           <div className="flex justify-center items-center space-x-3 mb-4">
@@ -248,7 +223,6 @@ export default function MealPlanningDashboard() {
               Privacy Policy
             </a>
           </div>
-          
         </div>
       </footer>
     </div>
