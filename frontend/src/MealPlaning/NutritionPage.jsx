@@ -226,7 +226,7 @@ export default function NutritionPage() {
               </div>
             </motion.div>
 
-            {/* Dairy Item */}
+            {/* Dairy Items */}
             <motion.div
               variants={cardVariants}
               initial="hidden"
