@@ -120,7 +120,7 @@ export default function MealPlanningDashboard() {
               </Link>
             </motion.div>
 
-            {/* Bulk Meal Planning Card */}
+            {/* Bulk Meal Planing Card */}
             <motion.div
               variants={cardVariants}
               initial="hidden"
