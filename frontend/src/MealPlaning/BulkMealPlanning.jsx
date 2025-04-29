@@ -15,6 +15,28 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
+// Predefined meal options for quick fill
+const mealOptions = {
+  Breakfast: [
+    'Oatmeal with Berries',
+    'Pancakes with Maple Syrup',
+    'Avocado Toast',
+    'Greek Yogurt with Honey',
+  ],
+  Lunch: [
+    'Grilled Chicken Salad',
+    'Turkey Sandwich',
+    'Vegetable Stir-Fry',
+    'Quinoa Bowl with Veggies',
+  ],
+  Dinner: [
+    'Roasted Salmon with Potatoes',
+    'Spaghetti Bolognese',
+    'Grilled Steak with Veggies',
+    'Vegetarian Lasagna',
+  ],
+};
+
 export default function BulkMealPlanning() {
   const [mealPlans, setMealPlans] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
@@ -31,15 +53,17 @@ export default function BulkMealPlanning() {
       sunday: { breakfast: '', lunch: '', dinner: '' },
     },
   });
+  const [error, setError] = useState('');
 
-  // Fetch all meal plans on component mount
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     fetchMealPlans();
   }, []);
 
   const fetchMealPlans = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/meal-plans');
+      const response = await axios.get('http://localhost:7001/api/meal-plans');
       setMealPlans(response.data);
     } catch (err) {
       console.error('Error fetching meal plans:', err);
@@ -64,25 +88,34 @@ export default function BulkMealPlanning() {
       ...prev,
       weekStartDate: e.target.value,
     }));
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedDate = new Date(formData.weekStartDate);
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < todayDate) {
+      setError('Please select today or a future date for the week start date.');
+      return;
+    }
+
     try {
       let savedPlan;
       if (editingPlan) {
-        // Update existing meal plan
-        const response = await axios.put(`http://localhost:5000/api/meal-plans/${editingPlan._id}`, formData);
+        const response = await axios.put(`http://localhost:7001/api/meal-plans/${editingPlan._id}`, formData);
         setMealPlans(mealPlans.map((plan) => (plan._id === editingPlan._id ? response.data : plan)));
         savedPlan = response.data;
         setEditingPlan(null);
       } else {
-        // Create new meal plan
-        const response = await axios.post('http://localhost:5000/api/meal-plans', formData);
+        const response = await axios.post('http://localhost:7001/api/meal-plans', formData);
         setMealPlans([...mealPlans, response.data]);
         savedPlan = response.data;
       }
-      // Reset form
       setFormData({
         weekStartDate: '',
         meals: {
@@ -95,24 +128,26 @@ export default function BulkMealPlanning() {
           sunday: { breakfast: '', lunch: '', dinner: '' },
         },
       });
-      // Navigate to the details page with the saved meal plan's ID
+      setError('');
       navigate(`/meal-plan-details/${savedPlan._id}`);
     } catch (err) {
       console.error('Error saving meal plan:', err);
+      setError('Failed to save meal plan. Please try again.');
     }
   };
 
   const handleEdit = (plan) => {
     setEditingPlan(plan);
     setFormData({
-      weekStartDate: plan.weekStartDate.split('T')[0], // Format date for input
+      weekStartDate: plan.weekStartDate.split('T')[0],
       meals: plan.meals,
     });
+    setError('');
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/meal-plans/${id}`);
+      await axios.delete(`http://localhost:7001/api/meal-plans/${id}`);
       setMealPlans(mealPlans.filter((plan) => plan._id !== id));
     } catch (err) {
       console.error('Error deleting meal plan:', err);
@@ -210,6 +245,9 @@ export default function BulkMealPlanning() {
             <h3 className="text-2xl font-semibold text-white mb-4">
               {editingPlan ? 'Edit Meal Plan' : 'Create a New Meal Plan'}
             </h3>
+            {error && (
+              <p className="text-red-500 mb-4 text-center">{error}</p>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-white mb-2">Week Start Date</label>
@@ -219,6 +257,7 @@ export default function BulkMealPlanning() {
                   onChange={handleDateChange}
                   className="w-full p-2 rounded-lg bg-gray-700 text-white"
                   required
+                  min={today}
                 />
               </div>
               {daysOfWeek.map((day) => (
@@ -227,33 +266,48 @@ export default function BulkMealPlanning() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-white mb-1">Breakfast</label>
-                      <input
-                        type="text"
+                      <select
                         value={formData.meals[day].breakfast}
                         onChange={(e) => handleInputChange(day, 'breakfast', e.target.value)}
                         className="w-full p-2 rounded-lg bg-gray-700 text-white"
-                        placeholder="e.g., Oatmeal with Berries"
-                      />
+                      >
+                        <option value="">Select Breakfast</option>
+                        {mealOptions.Breakfast.map((meal, index) => (
+                          <option key={index} value={meal}>
+                            {meal}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-white mb-1">Lunch</label>
-                      <input
-                        type="text"
+                      <select
                         value={formData.meals[day].lunch}
                         onChange={(e) => handleInputChange(day, 'lunch', e.target.value)}
                         className="w-full p-2 rounded-lg bg-gray-700 text-white"
-                        placeholder="e.g., Grilled Chicken Salad"
-                      />
+                      >
+                        <option value="">Select Lunch</option>
+                        {mealOptions.Lunch.map((meal, index) => (
+                          <option key={index} value={meal}>
+                            {meal}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-white mb-1">Dinner</label>
-                      <input
-                        type="text"
+                      <select
                         value={formData.meals[day].dinner}
                         onChange={(e) => handleInputChange(day, 'dinner', e.target.value)}
                         className="w-full p-2 rounded-lg bg-gray-700 text-white"
-                        placeholder="e.g., Spaghetti Bolognese"
-                      />
+                      >
+                        <option value="">Select Dinner</option>
+                        {mealOptions.Dinner.map((meal, index) => (
+                          <option key={index} value={meal}>
+                            {meal}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -282,6 +336,7 @@ export default function BulkMealPlanning() {
                           sunday: { breakfast: '', lunch: '', dinner: '' },
                         },
                       });
+                      setError('');
                     }}
                     className="bg-gray-500 text-white px-6 py-3 rounded-full text-lg font-medium hover:bg-gray-600 transition-all duration-300"
                   >
@@ -292,7 +347,7 @@ export default function BulkMealPlanning() {
             </form>
           </motion.div>
 
-          {/* List of Existing Meal Plans */}
+          {/* List of Existing Meal Plans - Enhanced Design */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mealPlans.map((plan) => (
               <motion.div
@@ -300,35 +355,63 @@ export default function BulkMealPlanning() {
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
-                className="bg-gray-500/30 backdrop-blur-md rounded-2xl shadow-lg p-6"
+                className="bg-gradient-to-br from-teal-500/20 via-blue-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-teal-300/30 hover:shadow-xl transition-shadow duration-300"
               >
-                <h3 className="text-2xl font-semibold text-white mb-4">
+                <h3 className="text-2xl font-semibold text-teal-100 mb-4 text-center bg-teal-700/50 py-2 rounded-lg">
                   Week of {new Date(plan.weekStartDate).toLocaleDateString()}
                 </h3>
-                {daysOfWeek.map((day) => (
-                  <div key={day} className="mb-4">
-                    <h4 className="text-lg font-medium text-white capitalize">{day}</h4>
-                    <p className="text-white">Breakfast: {plan.meals[day].breakfast || 'Not set'}</p>
-                    <p className="text-white">Lunch: {plan.meals[day].lunch || 'Not set'}</p>
-                    <p className="text-white">Dinner: {plan.meals[day].dinner || 'Not set'}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Left Column: Monday - Wednesday */}
+                  <div>
+                    {daysOfWeek.slice(0, 3).map((day) => (
+                      <div key={day} className="mb-3">
+                        <h4 className="text-lg font-medium text-teal-200 capitalize bg-teal-600/30 py-1 px-2 rounded">{day}</h4>
+                        <p className="text-blue-100 text-sm mt-1">
+                          <span className="font-medium">B:</span> {plan.meals[day].breakfast || 'Not set'}
+                        </p>
+                        <p className="text-blue-100 text-sm">
+                          <span className="font-medium">L:</span> {plan.meals[day].lunch || 'Not set'}
+                        </p>
+                        <p className="text-blue-100 text-sm">
+                          <span className="font-medium">D:</span> {plan.meals[day].dinner || 'Not set'}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <div className="flex space-x-4">
+                  {/* Right Column: Thursday - Sunday */}
+                  <div>
+                    {daysOfWeek.slice(3).map((day) => (
+                      <div key={day} className="mb-3">
+                        <h4 className="text-lg font-medium text-teal-200 capitalize bg-teal-600/30 py-1 px-2 rounded">{day}</h4>
+                        <p className="text-blue-100 text-sm mt-1">
+                          <span className="font-medium">B:</span> {plan.meals[day].breakfast || 'Not set'}
+                        </p>
+                        <p className="text-blue-100 text-sm">
+                          <span className="font-medium">L:</span> {plan.meals[day].lunch || 'Not set'}
+                        </p>
+                        <p className="text-blue-100 text-sm">
+                          <span className="font-medium">D:</span> {plan.meals[day].dinner || 'Not set'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-center space-x-4 mt-4">
                   <button
                     onClick={() => handleEdit(plan)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
+                    className="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition-all duration-300 shadow-md"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(plan._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300"
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300 shadow-md"
                   >
                     Delete
                   </button>
                   <NavLink
                     to={`/meal-plan-details/${plan._id}`}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all duration-300"
+                    className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md"
                   >
                     View Details
                   </NavLink>
@@ -361,7 +444,6 @@ export default function BulkMealPlanning() {
               Privacy Policy
             </a>
           </div>
-          <p className="text-gray-400 text-xs md:text-sm">Powered by xAI</p>
         </div>
       </footer>
     </div>

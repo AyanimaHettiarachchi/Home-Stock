@@ -165,6 +165,7 @@ function Home() {
                 </motion.span>
               </NavLink>
             </div>
+            
           </div>
         </footer>
       </div>

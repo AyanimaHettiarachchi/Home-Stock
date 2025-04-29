@@ -287,7 +287,7 @@ export default function NutritionPage() {
               Privacy Policy
             </a>
           </div>
-          <p className="text-gray-400 text-xs md:text-sm">Powered by xAI</p>
+          
         </div>
       </footer>
     </div>

@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,9 +15,15 @@ app.use(cors({
 }));
 
 // Routes
-const notificationRoutes = require('./routes/notifications');
+const notificationRoutes = require('./routes/notifications'); // Assuming this exists
+const mealRoutes = require('./routes/mealRoutes'); // Assuming this exists
+const mealPlansRouter = require('./routes/mealPlans'); // Add this line
+
+
 const feedbackRoutes = require('./routes/feedback'); // Add feedback routes
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/meals', mealRoutes);
+app.use('/api/meal-plans', mealPlansRouter); // Add this line
 app.use('/api/feedback', feedbackRoutes); // New route for feedback
 
 // MongoDB Connection
