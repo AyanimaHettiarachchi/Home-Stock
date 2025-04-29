@@ -90,7 +90,7 @@ function FeedbackReport() {
     doc.text('All Feedback Entries', 10, yOffset);
     yOffset += 10;
 
-    // Table Header
+    // Table Headers
     doc.setFontSize(10);
     doc.setFillColor(0, 102, 204); // Blue header
     doc.rect(10, yOffset, 190, 10, 'F');
@@ -103,7 +103,7 @@ function FeedbackReport() {
     doc.text('Submitted On', 150, yOffset + 7);
     yOffset += 10;
 
-    // Table Rows with Increased Space
+    // Table Rows with Increased Spacing
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0);
     feedbackList.forEach((feedback, index) => {
