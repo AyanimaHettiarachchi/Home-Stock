@@ -8,6 +8,16 @@ function Home() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
   };
 
+  // Animation variants for navigation links
+  const navLinkVariants = {
+    hover: { 
+      scale: 1.1, 
+      color: '#d1b3ff', 
+      transition: { duration: 0.3, ease: 'easeOut' } 
+    },
+    tap: { scale: 0.95, transition: { duration: 0.2 } }
+  };
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
@@ -16,40 +26,46 @@ function Home() {
       }}
     >
       {/* Overlay for Readability */}
-      <div className="absolute inset-0 bg-black/50 md:bg-black/40 lg:bg-black/30"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/30"></div>
 
       <div className="relative min-h-screen flex flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
+        <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-gray-900/70 to-gray-900/70 backdrop-blur-lg shadow-xl border-b border-gray-700/30">
           <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 md:px-6">
             <div className="flex items-center space-x-4">
               <NavLink to="/">
-                <img
+                <motion.img
                   src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
                   alt="Header Logo"
-                  className="w-12 h-12 object-contain hover:scale-105 transition-transform duration-300"
+                  className="w-12 h-12 object-contain"
+                  whileHover={{ scale: 1.1, rotate: 360 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
               </NavLink>
-              <h1 className="text-xl md:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">
-                Home Stock 
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">
+                Home Stock
               </h1>
             </div>
             <nav className="flex space-x-4 md:space-x-6">
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                Home
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Home
+                </motion.span>
               </NavLink>
               <NavLink
                 to="/notification-and-expiry-alerts"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                Notifications
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Notifications
+                </motion.span>
               </NavLink>
               <NavLink
                 to="/meal-planning-dashboard"
@@ -62,10 +78,12 @@ function Home() {
               <NavLink
                 to="/notification-settings"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                Settings
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Settings
+                </motion.span>
               </NavLink>
             </nav>
           </div>
@@ -79,10 +97,10 @@ function Home() {
             animate="visible"
             variants={fadeIn}
           >
-            <h1 className="text-5xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
-              Welcome to Home Stock 
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
+              Welcome to Home Stock
             </h1>
-            <p className="text-gray-100 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed">
+            <p className="text-gray-50 text-lg sm:text-xl md:text-2xl mb-10 font-light leading-relaxed drop-shadow-md">
               Organize your inventory, track expirations, and stay alerted with our intuitive management system.
             </p>
             <div className="flex justify-center space-x-4 md:space-x-6">
@@ -102,29 +120,51 @@ function Home() {
           </motion.div>
         </main>
 
-        {/* Footer */}
-        <footer className="w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
+        {/* Updated Footer */}
+        <footer className="w-full bg-gradient-to-r from-gray-900/70 to-gray-900/70 backdrop-blur-lg shadow-xl border-t border-gray-700/30">
           <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
             <div className="flex justify-center items-center space-x-3 mb-4">
-              <img
+              <motion.img
                 src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
                 alt="Footer Logo"
-                className="w-10 h-10 object-contain hover:scale-105 transition-transform duration-300"
+                className="w-10 h-10 object-contain"
+                whileHover={{ scale: 1.1, rotate: 360 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-              <p className="text-white text-sm md:text-base">© 2025 Home Stock. All rights reserved.</p>
+              <p className="text-white text-sm md:text-base drop-shadow-sm">© 2025 Home Stock. All rights reserved.</p>
             </div>
             <div className="flex justify-center space-x-4 md:space-x-6 mb-4">
-              <a href="#about" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-                About
-              </a>
-              <a href="#contact" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-                Contact
-              </a>
-              <a href="#privacy" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-                Privacy Policy
-              </a>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  About
+                </motion.span>
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Contact
+                </motion.span>
+              </NavLink>
+              <NavLink
+                to="/privacy-policy"
+                className={({ isActive }) =>
+                  `text-gray-300 text-sm md:text-base transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Privacy Policy
+                </motion.span>
+              </NavLink>
             </div>
-            <p className="text-gray-400 text-xs md:text-sm">Powered by AT</p>
           </div>
         </footer>
       </div>

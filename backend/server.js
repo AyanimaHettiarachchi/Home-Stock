@@ -8,18 +8,16 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173', // Adjust to match your frontend port
+  origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
 
 // Routes
-const notificationRoutes = require('./routes/notifications'); // Assuming this exists
-const mealRoutes = require('./routes/mealRoutes');
-
+const notificationRoutes = require('./routes/notifications');
+const feedbackRoutes = require('./routes/feedback'); // Add feedback routes
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/meals', mealRoutes);
-
+app.use('/api/feedback', feedbackRoutes); // New route for feedback
 
 // MongoDB Connection
 const connectionString = process.env.CONNECTION_STRING;
