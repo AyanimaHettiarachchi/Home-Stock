@@ -287,7 +287,6 @@ function NotificationHistory() {
                 Privacy Policy
               </a>
             </div>
-            <p className="text-gray-400 text-xs md:text-sm">Powered by AT</p>
           </div>
         </footer>
       </div>
