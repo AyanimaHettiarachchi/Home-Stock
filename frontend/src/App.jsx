@@ -5,6 +5,8 @@ import NotificationHome from './NotificationAlerts/NotificationHome';
 import Notifications from './NotificationAlerts/Notifications';
 import NotificationSettings from './NotificationAlerts/NotificationSettings';
 import NotificationHistory from './NotificationAlerts/NotificationHistory';
+import UserFeedback from './NotificationAlerts/UserFeedback';
+import FeedbackReport from './NotificationAlerts/FeedbackReport';
 
 import About from './HomePage/About'; // New page
 import Contact from './HomePage/Contact'; // New page
