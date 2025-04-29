@@ -7,9 +7,8 @@ const notificationSchema = new mongoose.Schema({
     required: true,
   },
   itemId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Item', // Reference to an Item model (if implemented by your team)
-    required: true,
+    type: String, // Changed from ObjectId to String
+    ref: 'Item', // Still references Item, but as a string
   },
   message: {
     type: String,
@@ -22,7 +21,7 @@ const notificationSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to a User model (if implemented by your team)
+    ref: 'User',
     required: true,
   },
   preferences: {
@@ -58,7 +57,6 @@ const notificationSchema = new mongoose.Schema({
   },
 });
 
-// Optional: Add an index for better query performance on userId and status
 notificationSchema.index({ userId: 1, status: 1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

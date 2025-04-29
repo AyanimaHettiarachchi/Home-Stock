@@ -1,7 +1,7 @@
+// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -9,14 +9,19 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173', // Adjust to match your frontend port (e.g., Vite default)
+  origin: 'http://localhost:5173', // Adjust to match your frontend port
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true, // Allow cookies/auth credentials if needed
+  credentials: true,
 }));
 
 // Routes
-const notificationRoutes = require('./routes/notifications');
+const notificationRoutes = require('./routes/notifications'); // Assuming this exists
+const mealRoutes = require('./routes/mealRoutes'); // Assuming this exists
+const mealPlansRouter = require('./routes/mealPlans'); // Add this line
+
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/meals', mealRoutes);
+app.use('/api/meal-plans', mealPlansRouter); // Add this line
 
 // MongoDB Connection
 const connectionString = process.env.CONNECTION_STRING;
@@ -28,12 +33,12 @@ mongoose.connect(connectionString, {
   .then(() => console.log('Database connected successfully'))
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   });
 
 // Server Port
 const port = 7001;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
