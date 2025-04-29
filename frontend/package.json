@@ -17,6 +17,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "framer-motion": "^12.5.0",
+    "frontend": "file:",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.2",
     "postcss": "^8.5.3",
