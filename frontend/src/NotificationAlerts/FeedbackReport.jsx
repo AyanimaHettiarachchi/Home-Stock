@@ -158,8 +158,9 @@ function FeedbackReport() {
       yOffset += rowHeight;
     });
 
-    // Footer
+    // Footer with Download Date Below Website
     const pageCount = doc.internal.getNumberOfPages();
+    const downloadDate = new Date().toLocaleString(); // Current date and time
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setDrawColor(150);
@@ -174,6 +175,7 @@ function FeedbackReport() {
       doc.text('Address: 64/ Main Street , colombo - 10', 10, 278);
       doc.text('Phone: +94 (70) 5346902  |  Email: support@homestock.com', 10, 284);
       doc.text('Website: www.homestock.com', 10, 290);
+      doc.text(`Downloaded on: ${downloadDate}`, 10, 296); // Download date below website
       doc.text(`Page ${i} of ${pageCount}`, 190, 290, { align: 'right' });
     }
 
