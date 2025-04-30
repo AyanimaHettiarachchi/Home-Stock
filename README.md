@@ -1,1 +1,2 @@
+# Homestock
 # We built this webapp to help households manage their inventory efficiently and reduce food wastage. With Home Stock, we provide real-time inventory tracking, expiry alerts. Users can add items, receive notifications for low stock or expiring goods, and get smart shopping recommendations based on their inventory and meal plans. Our goal is to make household management seamless while promoting sustainable consumption.
