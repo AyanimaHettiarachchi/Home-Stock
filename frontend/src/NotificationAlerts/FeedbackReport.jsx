@@ -63,7 +63,7 @@ function FeedbackReport() {
 
     doc.setFontSize(12);
     doc.setFillColor(230, 240, 255); // Very light blue
-    doc.rect(10, yOffset, 50, 25, 'F'); // Total Feedback box
+    doc.rect(10, yOffset, 50, 25, 'F'); // Total Feedback
     doc.setTextColor(0);
     doc.setFont('helvetica', 'normal');
     doc.text('Total Feedback', 12, yOffset + 8);
@@ -71,7 +71,7 @@ function FeedbackReport() {
     doc.text(`${totalFeedback}`, 12, yOffset + 18);
 
     doc.setFillColor(230, 240, 255);
-    doc.rect(70, yOffset, 50, 25, 'F'); // Average Rating box
+    doc.rect(70, yOffset, 50, 25, 'F'); // Average Rating
     doc.setFont('helvetica', 'normal');
     doc.text('Average Rating', 72, yOffset + 8);
     doc.setFont('helvetica', 'bold');
