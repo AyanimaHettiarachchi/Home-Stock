@@ -18,6 +18,7 @@ app.use(cors({
 const notificationRoutes = require('./routes/notifications'); // Assuming this exists
 const mealRoutes = require('./routes/mealRoutes'); // Assuming this exists
 const mealPlansRouter = require('./routes/mealPlans'); // Add this line
+const inventoryRoutes = require('./routes/inventoryRoutes');
 
 
 const feedbackRoutes = require('./routes/feedback'); // Add feedback routes
@@ -25,6 +26,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/meals', mealRoutes);
 app.use('/api/meal-plans', mealPlansRouter); // Add this line
 app.use('/api/feedback', feedbackRoutes); // New route for feedback
+app.use('/api/inventory', inventoryRoutes);
 
 // MongoDB Connection
 const connectionString = process.env.CONNECTION_STRING;

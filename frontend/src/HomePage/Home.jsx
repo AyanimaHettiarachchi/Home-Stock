@@ -68,12 +68,24 @@ function Home() {
                 </motion.span>
               </NavLink>
               <NavLink
-                to="/meal-planning-dashboard"
+                to="/inventory"
                 className={({ isActive }) =>
-                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
                 }
               >
-                Meal Planning
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Inventory
+                </motion.span>
+              </NavLink>
+              <NavLink
+                to="/meal-planning-dashboard"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                <motion.span variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                  Meal Planning
+                </motion.span>
               </NavLink>
               <NavLink
                 to="/notification-settings"
@@ -120,7 +132,7 @@ function Home() {
           </motion.div>
         </main>
 
-        {/* Updated Footer */}
+        {/* Footer */}
         <footer className="w-full bg-gradient-to-r from-gray-900/70 to-gray-900/70 backdrop-blur-lg shadow-xl border-t border-gray-700/30">
           <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
             <div className="flex justify-center items-center space-x-3 mb-4">
@@ -165,7 +177,6 @@ function Home() {
                 </motion.span>
               </NavLink>
             </div>
-            
           </div>
         </footer>
       </div>

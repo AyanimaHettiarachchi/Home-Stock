@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Preferences = require('../models/Preferences');
 const Notification = require('../models/Notification');
+const Inventory = require('../models/Inventory'); // Import Inventory model
 require('dotenv').config();
 
 // Default values for preferences fields
@@ -13,6 +14,38 @@ const defaultPreferences = {
   timeZone: 'UTC',
   lowStockThreshold: 10,
   expiryThresholdDays: 7,
+};
+
+// Check inventory for alerts and create notifications
+const checkInventoryAlerts = async (userId) => {
+  const inventories = await Inventory.find({ userId });
+  const preferences = await Preferences.findOne({ userId }) || { ...defaultPreferences, userId };
+
+  for (const item of inventories) {
+    const today = new Date();
+    const expiryDate = new Date(item.expiryDate);
+    const daysDiff = (expiryDate - today) / (1000 * 60 * 60 * 24);
+
+    // Low stock alert
+    if (item.quantity <= preferences.lowStockThreshold) {
+      const message = `Low stock alert: ${item.name} (Quantity: ${item.quantity})`;
+      await Notification.findOneAndUpdate(
+        { userId, itemId: item._id, message, status: 'active' },
+        { type: 'low-stock', itemId: item._id, message, status: 'active', userId },
+        { upsert: true, new: true }
+      );
+    }
+
+    // Expiry alert
+    if (item.expiryDate && daysDiff <= preferences.expiryThresholdDays && daysDiff > 0) {
+      const message = `${item.name} expires on ${expiryDate.toLocaleDateString()}`;
+      await Notification.findOneAndUpdate(
+        { userId, itemId: item._id, message, status: 'active' },
+        { type: 'expiry', itemId: item._id, message, status: 'active', userId },
+        { upsert: true, new: true }
+      );
+    }
+  }
 };
 
 // Create new notification preferences (POST /api/notifications/preferences)
@@ -29,7 +62,6 @@ router.post('/preferences', async (req, res) => {
       expiryThresholdDays,
     } = req.body;
 
-    // Validate required fields
     if (!userId || !name) {
       return res.status(400).json({ error: 'User ID and name are required.' });
     }
@@ -40,13 +72,11 @@ router.post('/preferences', async (req, res) => {
       return res.status(400).json({ error: 'Threshold values must be at least 1.' });
     }
 
-    // Check if preferences already exist
     let preferences = await Preferences.findOne({ userId });
     if (preferences) {
       return res.status(400).json({ error: 'Preferences already exist for this user. Use PUT to update.' });
     }
 
-    // Create new preferences
     preferences = new Preferences({
       userId,
       name,
@@ -73,7 +103,6 @@ router.get('/preferences/:userId', async (req, res) => {
     let preferences = await Preferences.findOne({ userId });
 
     if (!preferences) {
-      // If no preferences exist, return default values
       preferences = {
         userId,
         ...defaultPreferences,
@@ -101,7 +130,6 @@ router.put('/preferences/:userId', async (req, res) => {
       expiryThresholdDays,
     } = req.body;
 
-    // Validate required fields
     if (!name) {
       return res.status(400).json({ error: 'Name is required.' });
     }
@@ -115,7 +143,6 @@ router.put('/preferences/:userId', async (req, res) => {
     let preferences = await Preferences.findOne({ userId });
 
     if (!preferences) {
-      // If no preferences exist, create new ones
       preferences = new Preferences({
         userId,
         name,
@@ -127,7 +154,6 @@ router.put('/preferences/:userId', async (req, res) => {
         expiryThresholdDays: expiryThresholdDays || 7,
       });
     } else {
-      // Update existing preferences
       preferences.name = name;
       preferences.emailNotifications = emailNotifications ?? preferences.emailNotifications;
       preferences.push = push ?? preferences.push;
@@ -162,39 +188,90 @@ router.delete('/preferences/:userId', async (req, res) => {
   }
 });
 
+// Get active notifications for a user (GET /api/notifications/:userId)
+router.get('/:userId', async (req, res) => {
+  try {
+    await checkInventoryAlerts(req.params.userId); // Generate alerts based on inventory
+    const notifications = await Notification.find({ userId: req.params.userId, status: 'active' }).sort({ createdAt: -1 });
+    res.json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
+// Get notification history for a user (GET /api/notifications/history/:userId)
+router.get('/history/:userId', async (req, res) => {
+  try {
+    await checkInventoryAlerts(req.params.userId); // Generate alerts based on inventory
+    const history = await Notification.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching history:', error);
+    res.status(500).json({ error: 'Failed to fetch notification history' });
+  }
+});
+
 // Create a new notification (POST /api/notifications/)
 router.post('/', async (req, res) => {
   try {
-    const { name, message, category, userId } = req.body;
+    const { type, itemId, message, userId } = req.body;
 
-    if (!name || !message || !category || !userId) {
-      return res.status(400).json({ error: 'All fields are required.' });
-    }
-
-    const preferences = await Preferences.findOne({ userId });
-    if (!preferences) {
-      return res.status(404).json({ error: 'User preferences not found.' });
+    if (!type || !message || !userId) {
+      return res.status(400).json({ error: 'Type, message, and userId are required.' });
     }
 
     const notification = new Notification({
-      name,
+      type,
+      itemId,
       message,
-      category,
       userId,
     });
 
     await notification.save();
 
-    // Since emailAddress is removed, we'll assume notifications are sent via push or other means
-    if (preferences.push) {
+    const preferences = await Preferences.findOne({ userId });
+    if (preferences && preferences.push) {
       console.log(`Push notification sent to user ${userId}: ${message}`);
-      // In a real app, you'd integrate with a push notification service here
     }
 
     res.status(201).json(notification);
   } catch (error) {
     console.error('Error creating notification:', error);
     res.status(400).json({ error: error.message });
+  }
+});
+
+// Update a notification (PUT /api/notifications/:id)
+router.put('/:id', async (req, res) => {
+  try {
+    const { message, status } = req.body;
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    notification.message = message || notification.message;
+    notification.status = status || notification.status;
+    await notification.save();
+    res.json(notification);
+  } catch (error) {
+    console.error('Error updating notification:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete a notification (DELETE /api/notifications/:id)
+router.delete('/:id', async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    await notification.deleteOne();
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 

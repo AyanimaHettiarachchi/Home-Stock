@@ -62,7 +62,7 @@ function Notifications() {
                 />
               </NavLink>
               <h1 className="text-2xl md:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">
-                Home Stock 
+                Home Stock
               </h1>
             </div>
             <nav className="flex space-x-4 md:space-x-6">
@@ -81,6 +81,22 @@ function Notifications() {
                 }
               >
                 Notifications
+              </NavLink>
+              <NavLink
+                to="/inventory"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Inventory
+              </NavLink>
+              <NavLink
+                to="/meal-planning-dashboard"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                }
+              >
+                Meal Planning
               </NavLink>
               <NavLink
                 to="/notification-settings"
@@ -126,7 +142,7 @@ function Notifications() {
                           <div>
                             <h3 className="font-semibold text-gray-800">{notif.type.charAt(0).toUpperCase() + notif.type.slice(1)} Alert</h3>
                             <p className="text-gray-700 mt-2">{notif.message}</p>
-                            <p className="text-sm text-gray-500 mt-1">Item ID: {notif.itemId}</p>
+                            {notif.itemId && <p className="text-sm text-gray-500 mt-1">Item: {notif.itemId}</p>}
                             <p className="text-sm text-gray-500 mt-1">Created: {new Date(notif.createdAt).toLocaleString()}</p>
                           </div>
                           <button
