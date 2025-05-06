@@ -17,6 +17,8 @@ import NutritionPage from './MealPlaning/NutritionPage';
 import RecipesPage from './MealPlaning/RecipesPage';
 import BulkMealPlanning from './MealPlaning/BulkMealPlanning';
 
+import Inventory from './inventory2/Inventory'; // New import
+
 
 function App() {
   return (
@@ -37,6 +39,9 @@ function App() {
         <Route path="/nutrition" element={<NutritionPage />} />
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/bulk-meal-planning" element={<BulkMealPlanning />} /> {/* Updated route */}
+
+        <Route path="/inventory" element={<Inventory />} /> {/* New route */}
+        
       </Routes>
     </BrowserRouter>
   );

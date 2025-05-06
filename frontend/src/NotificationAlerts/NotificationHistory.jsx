@@ -8,8 +8,8 @@ function NotificationHistory() {
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [error, setError] = useState(null);
-  const [editingId, setEditingId] = useState(null); // Track which notification is being edited
-  const [editForm, setEditForm] = useState({ message: '', status: '' }); // Form state for editing
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ message: '', status: '' });
   const userId = '507f1f77bcf86cd799439011'; // Replace with actual user ID
 
   useEffect(() => {
@@ -94,7 +94,7 @@ function NotificationHistory() {
                 />
               </NavLink>
               <h1 className="text-2xl md:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">
-                Home Stock 
+                Home Stock
               </h1>
             </div>
             <nav className="flex space-x-4 md:space-x-6">
@@ -117,6 +117,26 @@ function NotificationHistory() {
                 }
               >
                 Notifications
+              </NavLink>
+              <NavLink
+                to="/inventory"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${
+                    isActive ? 'underline underline-offset-4' : ''
+                  }`
+                }
+              >
+                Inventory
+              </NavLink>
+              <NavLink
+                to="/meal-planning-dashboard"
+                className={({ isActive }) =>
+                  `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${
+                    isActive ? 'underline underline-offset-4' : ''
+                  }`
+                }
+              >
+                Meal Planning
               </NavLink>
               <NavLink
                 to="/notification-settings"
@@ -222,12 +242,9 @@ function NotificationHistory() {
                               {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)} Alert
                             </h3>
                             <p className="text-gray-700 mt-2">{notif.message}</p>
-                            {notif.itemId && <p className="text-sm text-gray-500 mt-1">Item ID: {notif.itemId}</p>}
+                            {notif.itemId && <p className="text-sm text-gray-500 mt-1">Item: {notif.itemId}</p>}
                             <p className="text-sm text-gray-500 mt-1">
-                              Status:{' '}
-                              <span className={notif.status === 'active' ? 'text-green-600' : 'text-gray-500'}>
-                                {notif.status}
-                              </span>
+                              Status: <span className={notif.status === 'active' ? 'text-green-600' : 'text-gray-500'}>{notif.status}</span>
                             </p>
                             <p className="text-sm text-gray-500 mt-1">
                               Created: {new Date(notif.createdAt).toLocaleString()}
