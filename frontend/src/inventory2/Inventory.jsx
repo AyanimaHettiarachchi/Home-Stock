@@ -291,7 +291,6 @@ function Inventory() {
                     >
                       <option value="Food">Food</option>
                       <option value="Beverage">Beverage</option>
-                      <option value="Household">Household</option>
                       <option value="Personal Care">Personal Care</option>
                       <option value="Other">Other</option>
                     </select>

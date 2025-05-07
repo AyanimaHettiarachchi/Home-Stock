@@ -204,8 +204,12 @@ function NotificationSettings() {
                   <h1 className="text-3xl md:text-4xl font-bold bg-white bg-clip-text text-transparent drop-shadow-lg">
                     Notification Settings
                   </h1>
-                  <Link to="/notification-and-expiry-alerts" className="text-blue-700 hover:text-blue-400  text-1xl font-bold transition-colors duration-300">
-                    Back to Notifications
+                  <Link
+                    to="/notification-and-expiry-alerts"
+                    className="text-blue-400 hover:text-blue-600 text-base font-medium transition-colors flex items-center"
+                    aria-label="Back to Notification Home"
+                  >
+                    ← Back
                   </Link>
                 </motion.div>
 
