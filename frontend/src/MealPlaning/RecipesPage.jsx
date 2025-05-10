@@ -125,6 +125,7 @@ export default function RecipesPage() {
         'Toss the cooked spaghetti with the sauce. Serve with grated Parmesan cheese, if desired.',
       ],
     },
+    
     {
       name: 'Grilled Steak with Veggies',
       image: 'https://img.freepik.com/free-photo/roasted-pork-steak-vegetables-plate_1150-45291.jpg?t=st=1742823140~exp=1742826740~hmac=6d792eef7b9bc8fdecead56bea5b5342d478924fa3e2773953c49de941176c10&w=1380',
