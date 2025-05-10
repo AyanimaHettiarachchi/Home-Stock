@@ -227,7 +227,7 @@ export default function NutritionPage() {
             </motion.div>
 
             {/* Dairy Items */}
-            
+
             <motion.div
               variants={cardVariants}
               initial="hidden"
@@ -267,6 +267,7 @@ export default function NutritionPage() {
       </main>
 
       {/* Footer */}
+      
       <footer className="w-full bg-gray-900/30 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
           <div className="flex justify-center items-center space-x-3 mb-4">
