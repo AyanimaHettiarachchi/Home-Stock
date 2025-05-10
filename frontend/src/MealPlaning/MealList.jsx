@@ -833,6 +833,7 @@ export default function MealList() {
                       ingredients: "",
                       day: todayFormatted,
                     });
+                    
                     setSelectedMeal("");
                     setExtraIngredients("");
                     setUserNameError("");
