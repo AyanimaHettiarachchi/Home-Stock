@@ -15,6 +15,7 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
+
 export default function MealPlanDetails() {
   const { id } = useParams(); // Get the meal plan ID from the URL
   const navigate = useNavigate();
