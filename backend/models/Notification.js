@@ -7,8 +7,9 @@ const notificationSchema = new mongoose.Schema({
     required: true,
   },
   itemId: {
-    type: String, // Changed from ObjectId to String
-    ref: 'Item', // Still references Item, but as a string
+    type: String, // Changed to String to match frontend usage
+    required: false, // Made optional
+    default: '',
   },
   message: {
     type: String,
@@ -21,7 +22,7 @@ const notificationSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'User', // Assumes a User model exists
     required: true,
   },
   preferences: {
