@@ -12,6 +12,7 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
+
 export default function RecipesPage() {
   // Sample recipe data with images
   const recipes = [
