@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const mealOptions = {
   Breakfast: [
@@ -118,14 +120,6 @@ export default function MealList() {
 
     const doc = new jsPDF();
 
-    // Add Logo (Placeholder)
-    // Replace the line below with your base64-encoded logo string
-    // Example: const logoBase64 = "data:image/png;base64,iVBORw0KGgo...";
-    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
-    // You need to provide the base64 string for your logo
-    // For now, I'll comment this out since I don't have the logo
-    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
-
     // Header
     doc.setFontSize(22);
     doc.setTextColor(0, 102, 204);
@@ -155,21 +149,20 @@ export default function MealList() {
     // Table of Meal Entries (Centered)
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    const tableWidth = 190; // New table width to fit within margins
-    const pageWidth = 210; // A4 page width
-    const margin = (pageWidth - tableWidth) / 2; // Center the table
-    const tableStartX = margin; // Starting x position (10)
+    const tableWidth = 190;
+    const pageWidth = 210;
+    const margin = (pageWidth - tableWidth) / 2;
+    const tableStartX = margin;
 
-    doc.text("All Meal Entries", tableStartX, 130); // Center the title with the table
+    doc.text("All Meal Entries", tableStartX, 130);
 
     // Table Headers with Background and Borders
     doc.setFontSize(10);
     doc.setTextColor(0, 102, 204);
     doc.setFillColor(240, 240, 240);
-    doc.rect(tableStartX, 135, tableWidth, 10, "F"); // Background for header row
+    doc.rect(tableStartX, 135, tableWidth, 10, "F");
     doc.setDrawColor(0, 0, 0);
 
-    // Define column widths and positions
     const colWidths = {
       mealId: 15,
       userName: 23,
@@ -182,21 +175,21 @@ export default function MealList() {
     };
 
     let xPos = tableStartX;
-    doc.rect(xPos, 135, colWidths.mealId, 10); // Meal ID
+    doc.rect(xPos, 135, colWidths.mealId, 10);
     xPos += colWidths.mealId;
-    doc.rect(xPos, 135, colWidths.userName, 10); // User Name
+    doc.rect(xPos, 135, colWidths.userName, 10);
     xPos += colWidths.userName;
-    doc.rect(xPos, 135, colWidths.email, 10); // Email
+    doc.rect(xPos, 135, colWidths.email, 10);
     xPos += colWidths.email;
-    doc.rect(xPos, 135, colWidths.mealName, 10); // Meal Name
+    doc.rect(xPos, 135, colWidths.mealName, 10);
     xPos += colWidths.mealName;
-    doc.rect(xPos, 135, colWidths.mealType, 10); // Meal Type
+    doc.rect(xPos, 135, colWidths.mealType, 10);
     xPos += colWidths.mealType;
-    doc.rect(xPos, 135, colWidths.calories, 10); // Calories
+    doc.rect(xPos, 135, colWidths.calories, 10);
     xPos += colWidths.calories;
-    doc.rect(xPos, 135, colWidths.ingredients, 10); // Ingredients
+    doc.rect(xPos, 135, colWidths.ingredients, 10);
     xPos += colWidths.ingredients;
-    doc.rect(xPos, 135, colWidths.date, 10); // Date
+    doc.rect(xPos, 135, colWidths.date, 10);
 
     let yPos = 142;
     xPos = tableStartX;
@@ -228,30 +221,27 @@ export default function MealList() {
         doc.addPage();
         yPos = 20;
       }
-      // Alternating row background
       if (rowIndex % 2 === 1) {
         doc.setFillColor(245, 245, 245);
         doc.rect(tableStartX, yPos - 5, tableWidth, rowHeight, "F");
       }
-      // Draw borders for each cell
       xPos = tableStartX;
-      doc.rect(xPos, yPos - 5, colWidths.mealId, rowHeight); // Meal ID
+      doc.rect(xPos, yPos - 5, colWidths.mealId, rowHeight);
       xPos += colWidths.mealId;
-      doc.rect(xPos, yPos - 5, colWidths.userName, rowHeight); // User Name
+      doc.rect(xPos, yPos - 5, colWidths.userName, rowHeight);
       xPos += colWidths.userName;
-      doc.rect(xPos, yPos - 5, colWidths.email, rowHeight); // Email
+      doc.rect(xPos, yPos - 5, colWidths.email, rowHeight);
       xPos += colWidths.email;
-      doc.rect(xPos, yPos - 5, colWidths.mealName, rowHeight); // Meal Name
+      doc.rect(xPos, yPos - 5, colWidths.mealName, rowHeight);
       xPos += colWidths.mealName;
-      doc.rect(xPos, yPos - 5, colWidths.mealType, rowHeight); // Meal Type
+      doc.rect(xPos, yPos - 5, colWidths.mealType, rowHeight);
       xPos += colWidths.mealType;
-      doc.rect(xPos, yPos - 5, colWidths.calories, rowHeight); // Calories
+      doc.rect(xPos, yPos - 5, colWidths.calories, rowHeight);
       xPos += colWidths.calories;
-      doc.rect(xPos, yPos - 5, colWidths.ingredients, rowHeight); // Ingredients
+      doc.rect(xPos, yPos - 5, colWidths.ingredients, rowHeight);
       xPos += colWidths.ingredients;
-      doc.rect(xPos, yPos - 5, colWidths.date, rowHeight); // Date
+      doc.rect(xPos, yPos - 5, colWidths.date, rowHeight);
 
-      // Add text to each cell
       const textYPos = yPos + (rowHeight / 2) - 2;
       xPos = tableStartX;
       doc.text(meal.mealId || "N/A", xPos + 2, textYPos);
@@ -288,7 +278,6 @@ export default function MealList() {
       doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
     }
 
-    // Save the PDF
     doc.save(`Meal_Report_${userName}_${todayFormatted}.pdf`);
     setFormError("");
   };
@@ -463,6 +452,51 @@ export default function MealList() {
     }
   };
 
+  const showDeleteConfirmation = (mealId) => {
+    toast(
+      <div className="flex flex-col items-center p-4">
+        <p className="text-gray-800 font-semibold mb-4">
+          Are you sure you want to delete this meal?
+        </p>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => {
+              handleDeleteMeal(mealId);
+              toast.dismiss();
+              toast.success(
+                <div className="flex items-center">
+                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Meal deleted successfully!
+                </div>,
+                {
+                  className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
+                  autoClose: 3000,
+                }
+              );
+            }}
+            className="bg-red-500 text-white px-4 py-2 rounded-full font-medium hover:bg-red-600 transition-colors duration-300"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors duration-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        className: 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-l-4 border-yellow-500 shadow-lg',
+        autoClose: false,
+        closeButton: false,
+        position: "top-center",
+      }
+    );
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col"
@@ -493,7 +527,7 @@ export default function MealList() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-Colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
               }
             >
               Home
@@ -641,7 +675,7 @@ export default function MealList() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDeleteMeal(meal._id)}
+                        onClick={() => showDeleteConfirmation(meal._id)}
                         className="text-red-500 ml-4 hover:text-red-700 transition-colors duration-300 font-medium"
                       >
                         Delete
@@ -812,7 +846,38 @@ export default function MealList() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveMeal}
+                  onClick={async () => {
+                    await handleSaveMeal();
+                    if (!formError && !userNameError && !emailError && !extraIngredientsError) {
+                      if (editingMeal) {
+                        toast.success(
+                          <div className="flex items-center">
+                            <svg className="w-6 h-6 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Meal updated successfully!
+                          </div>,
+                          {
+                            className: 'bg-gradient-to-r from-blue-100 to-blue-200 border-l-4 border-blue-500 shadow-lg',
+                            autoClose: 3000,
+                          }
+                        );
+                      } else {
+                        toast.success(
+                          <div className="flex items-center">
+                            <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Meal added successfully!
+                          </div>,
+                          {
+                            className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
+                            autoClose: 3000,
+                          }
+                        );
+                      }
+                    }
+                  }}
                   className="bg-blue-500 text-white px-4 py-2 rounded-full font-medium hover:bg-blue-600 transition-colors duration-300 shadow-md"
                 >
                   Save
@@ -846,6 +911,8 @@ export default function MealList() {
           </div>
         </div>
       </footer>
+
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnHover />
     </div>
   );
 }
