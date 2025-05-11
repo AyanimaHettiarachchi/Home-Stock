@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import jsPDF from 'jspdf';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const mealOptions = {
   Breakfast: [
@@ -136,31 +134,26 @@ export default function MealList() {
     const userName = filteredMeals[0].userName;
     const doc = new jsPDF();
 
-    // Header
-    doc.setFillColor(33, 150, 243); // Blue background
+    doc.setFillColor(33, 150, 243);
     doc.rect(0, 0, 210, 40, 'F');
 
-    // Header Text
     doc.setFontSize(24);
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.text("Home Stock", 20, 20);
 
-    // Add Logo beside "Home Stock"
     const logoUrl = 'https://cdn-icons-png.flaticon.com/512/5968/5968817.png';
-    doc.addImage(logoUrl, 'PNG', 60, 10, 20, 20); // Logo at x=60mm, y=10mm, 20mm x 20mm
+    doc.addImage(logoUrl, 'PNG', 60, 10, 20, 20);
 
     doc.setFontSize(16);
     doc.text("Meal Report", 20, 30);
 
-    // Subtitle
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
     doc.setFont("helvetica", "normal");
     doc.text(`Generated for: ${userName}`, 20, 50);
     doc.text(`Date: ${todayFormatted}`, 20, 58);
 
-    // Table Setup
     const tableWidth = 170;
     const pageWidth = 210;
     const margin = (pageWidth - tableWidth) / 2;
@@ -174,11 +167,10 @@ export default function MealList() {
       date: 50,
     };
 
-    // Table Header
-    doc.setFillColor(240, 240, 240); // Light gray background
+    doc.setFillColor(240, 240, 240);
     doc.rect(tableStartX, tableStartY, tableWidth, 10, "F");
     doc.setFontSize(11);
-    doc.setTextColor(33, 150, 243); // Blue text
+    doc.setTextColor(33, 150, 243);
     doc.setFont("helvetica", "bold");
 
     let xPos = tableStartX;
@@ -194,7 +186,6 @@ export default function MealList() {
     doc.rect(xPos, tableStartY, colWidths.date, 10);
     doc.text("Date", xPos + 2, tableStartY + 7);
 
-    // Table Rows
     let yPos = tableStartY + 10;
     const rowHeight = 10;
     doc.setFontSize(10);
@@ -207,9 +198,8 @@ export default function MealList() {
         yPos = 20;
       }
 
-      // Alternating row background
       if (index % 2 === 0) {
-        doc.setFillColor(245, 245, 245); // Very light gray
+        doc.setFillColor(245, 245, 245);
         doc.rect(tableStartX, yPos, tableWidth, rowHeight, "F");
       }
 
@@ -229,7 +219,6 @@ export default function MealList() {
       yPos += rowHeight;
     });
 
-    // Footer
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -325,7 +314,6 @@ export default function MealList() {
       setSelectedMeal(selected);
       setExtraIngredients("");
       setExtraIngredientsError("");
-      // Save selected meal ingredients to local storage
       localStorage.setItem('selectedMealIngredients', JSON.stringify(mealData.basicIngredients));
     }
   };
@@ -404,61 +392,19 @@ export default function MealList() {
   };
 
   const handleDeleteMeal = async (id) => {
-    try {
-      await axios.delete(`http://localhost:7001/api/meals/${id}`);
-      const updatedMeals = meals.filter((meal) => meal._id !== id);
-      setMeals(updatedMeals);
-      setFilteredMeals(updatedMeals);
-      setFormError("");
-    } catch (err) {
-      console.error("Error deleting meal:", err);
-      setFormError("Failed to delete meal. Please try again.");
-    }
-  };
-
-  const showDeleteConfirmation = (mealId) => {
-    toast(
-      <div className="flex flex-col items-center p-4">
-        <p className="text-gray-800 font-semibold mb-4">
-          Are you sure you want to delete this meal?
-        </p>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => {
-              handleDeleteMeal(mealId);
-              toast.dismiss();
-              toast.success(
-                <div className="flex items-center">
-                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Meal deleted successfully!
-                </div>,
-                {
-                  className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
-                  autoClose: 3000,
-                }
-              );
-            }}
-            className="bg-red-500 text-white px-4 py-2 rounded-full font-medium hover:bg-red-600 transition-colors duration-300"
-          >
-            Confirm
-          </button>
-          <button
-            onClick={() => toast.dismiss()}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors duration-300"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>,
-      {
-        className: 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-l-4 border-yellow-500 shadow-lg',
-        autoClose: false,
-        closeButton: false,
-        position: "top-center",
+    if (window.confirm('Are you sure you want to delete this meal?')) {
+      try {
+        await axios.delete(`http://localhost:7001/api/meals/${id}`);
+        const updatedMeals = meals.filter((meal) => meal._id !== id);
+        setMeals(updatedMeals);
+        setFilteredMeals(updatedMeals);
+        setFormError("");
+        alert('Meal deleted successfully!');
+      } catch (err) {
+        console.error("Error deleting meal:", err);
+        setFormError("Failed to delete meal. Please try again.");
       }
-    );
+    }
   };
 
   return (
@@ -632,7 +578,7 @@ export default function MealList() {
                       Edit
                     </button>
                     <button
-                      onClick={() => showDeleteConfirmation(meal._id)}
+                      onClick={() => handleDeleteMeal(meal._id)}
                       className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors duration-300"
                     >
                       Delete
@@ -820,8 +766,6 @@ export default function MealList() {
             </div>
           </div>
         )}
-
-        <ToastContainer />
       </main>
     </div>
   );

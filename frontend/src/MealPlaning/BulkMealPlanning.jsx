@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Animation variants for fade-in
 const fadeIn = {
@@ -49,7 +47,7 @@ export default function BulkMealPlanning() {
       wednesday: { breakfast: '', lunch: '', dinner: '' },
       thursday: { breakfast: '', lunch: '', dinner: '' },
       friday: { breakfast: '', lunch: '', dinner: '' },
-      saturday: { breakfast: '', deploying: '', dinner: '' },
+      saturday: { breakfast: '', lunch: '', dinner: '' },
       sunday: { breakfast: '', lunch: '', dinner: '' },
     },
   });
@@ -169,18 +167,10 @@ export default function BulkMealPlanning() {
       if (recentPlan && recentPlan._id === id) {
         setRecentPlan(null);
       }
-      toast.success('Meal plan deleted successfully!', {
-        position: 'top-center',
-        autoClose: 3000,
-        className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
-      });
+      alert('Meal plan deleted successfully!');
     } catch (err) {
       console.error('Error deleting meal plan:', err);
-      toast.error('Failed to delete meal plan', {
-        position: 'top-center',
-        autoClose: 3000,
-        className: 'bg-gradient-to-r from-red-100 to-red-200 border-l-4 border-red-500 shadow-lg',
-      });
+      alert('Failed to delete meal plan');
     }
   };
 
@@ -458,8 +448,6 @@ export default function BulkMealPlanning() {
           </motion.div>
         </motion.div>
       </main>
-
-      <ToastContainer />
     </div>
   );
 }

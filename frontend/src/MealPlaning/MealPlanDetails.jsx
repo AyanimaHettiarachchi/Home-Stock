@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Animation variants for fade-in
 const fadeIn = {
@@ -16,7 +14,7 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
-// Predefined meal options for quick fill (from BulkMealPlanning.jsx)
+// Predefined meal options for quick fill
 const mealOptions = {
   Breakfast: [
     'Oatmeal with Berries',
@@ -39,7 +37,7 @@ const mealOptions = {
 };
 
 export default function MealPlanDetails() {
-  const { id } = useParams(); // Get the meal plan ID from the URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +60,6 @@ export default function MealPlanDetails() {
   const [inventory, setInventory] = useState([]);
   const userId = '507f1f77bcf86cd799439011';
 
-  // Get today's date in YYYY-MM-DD format for the min attribute
   const today = new Date().toISOString().split('T')[0];
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -80,7 +77,7 @@ export default function MealPlanDetails() {
     } catch (err) {
       if (err.response?.status === 404) {
         setError('Meal plan not found');
-        navigate('/bulk-meal-planning'); // Redirect if plan is deleted
+        navigate('/bulk-meal-planning');
       } else {
         setError('Error fetching meal plan details');
       }
@@ -102,8 +99,6 @@ export default function MealPlanDetails() {
   useEffect(() => {
     fetchMealPlan();
     fetchInventory();
-
-    // Optional polling to refresh data every 30 seconds
     const interval = setInterval(fetchMealPlan, 30000);
     return () => clearInterval(interval);
   }, [id]);
@@ -149,21 +144,12 @@ export default function MealPlanDetails() {
       setIsEditing(false);
       setUpdateError('');
       setSuccessMessage('Meal plan updated successfully!');
-      toast.success('Meal plan updated successfully!', {
-        position: 'top-center',
-        autoClose: 3000,
-        className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
-      });
-      // Clear success message after 3 seconds
+      alert('Meal plan updated successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error updating meal plan:', err);
       setUpdateError('Failed to update meal plan');
-      toast.error('Failed to update meal plan', {
-        position: 'top-center',
-        autoClose: 3000,
-        className: 'bg-gradient-to-r from-red-100 to-red-200 border-l-4 border-red-500 shadow-lg',
-      });
+      alert('Failed to update meal plan');
     }
   };
 
@@ -172,19 +158,11 @@ export default function MealPlanDetails() {
       try {
         await axios.delete(`http://localhost:7001/api/meal-plans/${id}`);
         navigate('/bulk-meal-planning');
-        toast.success('Meal plan deleted successfully!', {
-          position: 'top-center',
-          autoClose: 3000,
-          className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
-        });
+        alert('Meal plan deleted successfully!');
       } catch (err) {
         console.error('Error deleting meal plan:', err);
         setError('Failed to delete meal plan');
-        toast.error('Failed to delete meal plan', {
-          position: 'top-center',
-          autoClose: 3000,
-          className: 'bg-gradient-to-r from-red-100 to-red-200 border-l-4 border-red-500 shadow-lg',
-        });
+        alert('Failed to delete meal plan');
       }
     }
   };
@@ -417,8 +395,6 @@ export default function MealPlanDetails() {
           </motion.div>
         </motion.div>
       </main>
-
-      <ToastContainer />
     </div>
   );
 }
