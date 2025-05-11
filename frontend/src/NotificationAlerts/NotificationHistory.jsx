@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,21 +8,12 @@ function NotificationHistory() {
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [error, setError] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ message: '', status: '' });
   const [isLoading, setIsLoading] = useState(false);
   const userId = '507f1f77bcf86cd799439011'; // Replace with actual user ID
-  const editInputRef = useRef(null);
 
   useEffect(() => {
     fetchHistory();
   }, []);
-
-  useEffect(() => {
-    if (editingId && editInputRef.current) {
-      editInputRef.current.focus();
-    }
-  }, [editingId]);
 
   const fetchHistory = async () => {
     setIsLoading(true);
@@ -38,40 +29,16 @@ function NotificationHistory() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDismiss = async (id) => {
     if (!confirm('Are you sure you want to dismiss this notification?')) return;
     setIsLoading(true);
     try {
       await axios.delete(`http://localhost:7001/api/notifications/${id}`);
-      setHistory(history.filter((notif) => notif._id !== id));
+      fetchHistory(); // Refetch history to reflect the updated status
       setError(null);
     } catch (error) {
-      console.error('Error deleting notification:', error);
-      setError('Failed to delete notification.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEdit = (notif) => {
-    setEditingId(notif._id);
-    setEditForm({ message: notif.message, status: notif.status });
-  };
-
-  const handleUpdate = async (id) => {
-    if (!editForm.message.trim()) {
-      setError('Message cannot be empty.');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const response = await axios.put(`http://localhost:7001/api/notifications/${id}`, editForm);
-      setHistory(history.map((notif) => (notif._id === id ? response.data : notif)));
-      setEditingId(null);
-      setError(null);
-    } catch (error) {
-      console.error('Error updating notification:', error);
-      setError(error.response?.data?.error || 'Failed to update notification.');
+      console.error('Error dismissing notification:', error);
+      setError('Failed to dismiss notification. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +67,7 @@ function NotificationHistory() {
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
       style={{
         backgroundImage: `url(https://images.pexels.com/photos/6169148/pexels-photo-6169148.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)`,
-        backgroundColor: '#1f2937', // Fallback color
+        backgroundColor: '#1f2937',
       }}
     >
       <div className="absolute inset-0 bg-black/40"></div>
@@ -258,131 +225,46 @@ function NotificationHistory() {
                         animate="visible"
                         transition={{ delay: index * 0.1 }}
                       >
-                        {editingId === notif._id ? (
-                          <div className="space-y-4 w-full">
-                            <div>
-                              <label
-                                htmlFor={`edit-message-${notif._id}`}
-                                className="sr-only"
+                        <div className="flex justify-between w-full">
+                          <div>
+                            <h3 className="font-semibold text-gray-200 text-lg">
+                              {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)} Alert
+                            </h3>
+                            <p className="text-gray-400 mt-2 leading-6">
+                              {notif.message.length > 100
+                                ? `${notif.message.slice(0, 100)}...`
+                                : notif.message}
+                            </p>
+                            {notif.itemId && (
+                              <p className="text-sm text-gray-500 mt-1">Item: {notif.itemId}</p>
+                            )}
+                            <p className="text-sm text-gray-400 mt-1">
+                              Status:{' '}
+                              <span
+                                className={
+                                  notif.status === 'active' ? 'text-green-400' : 'text-gray-500'
+                                }
                               >
-                                Edit notification message
-                              </label>
-                              <input
-                                id={`edit-message-${notif._id}`}
-                                type="text"
-                                value={editForm.message}
-                                onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
-                                className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                                placeholder="Edit notification message"
-                                ref={editInputRef}
-                                aria-label="Edit notification message"
-                              />
-                            </div>
-                            <div>
-                              <label
-                                htmlFor={`edit-status-${notif._id}`}
-                                className="sr-only"
-                              >
-                                Edit notification status
-                              </label>
-                              <select
-                                id={`edit-status-${notif._id}`}
-                                value={editForm.status}
-                                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                                className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                                aria-label="Edit notification status"
-                              >
-                                <option value="active">Active</option>
-                                <option value="dismissed">Dismissed</option>
-                              </select>
-                            </div>
-                            <div className="flex gap-3">
-                              <button
-                                onClick={() => handleUpdate(notif._id)}
-                                className="bg-blue-500 text-white px-5 py-2.5 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors flex items-center gap-2"
-                                disabled={isLoading}
-                                aria-label={`Save changes for notification ${notif.itemId || notif._id}`}
-                              >
-                                {isLoading && (
-                                  <svg
-                                    className="animate-spin h-4 w-4 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
-                                      stroke="currentColor"
-                                      strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                  </svg>
-                                )}
-                                Save
-                              </button>
-                              <button
-                                onClick={() => setEditingId(null)}
-                                className="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-                                disabled={isLoading}
-                                aria-label="Cancel editing"
-                              >
-                                Cancel
-                              </button>
-                            </div>
+                                {notif.status}
+                              </span>
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              Created: {new Date(notif.createdAt).toLocaleString()}
+                            </p>
                           </div>
-                        ) : (
-                          <div className="flex justify-between w-full">
-                            <div>
-                              <h3 className="font-semibold text-gray-200 text-lg">
-                                {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)} Alert
-                              </h3>
-                              <p className="text-gray-400 mt-2 leading-6">
-                                {notif.message.length > 100
-                                  ? `${notif.message.slice(0, 100)}...`
-                                  : notif.message}
-                              </p>
-                              {notif.itemId && (
-                                <p className="text-sm text-gray-500 mt-1">Item: {notif.itemId}</p>
-                              )}
-                              <p className="text-sm text-gray-400 mt-1">
-                                Status:{' '}
-                                <span
-                                  className={
-                                    notif.status === 'active' ? 'text-green-400' : 'text-gray-500'
-                                  }
-                                >
-                                  {notif.status}
-                                </span>
-                              </p>
-                              <p className="text-sm text-gray-500 mt-1">
-                                Created: {new Date(notif.createdAt).toLocaleString()}
-                              </p>
-                            </div>
+                          {notif.status === 'active' && (
                             <div className="flex gap-3">
                               <button
-                                onClick={() => handleEdit(notif)}
-                                className="text-green-400 hover:text-green-300 font-medium focus:ring-2 focus:ring-green-400 focus:ring-offset-2 rounded px-2 py-1"
-                                aria-label={`Edit notification for item ${notif.itemId || notif._id}`}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDelete(notif._id)}
+                                onClick={() => handleDismiss(notif._id)}
                                 className="text-red-400 hover:text-red-300 font-medium focus:ring-2 focus:ring-red-400 focus:ring-offset-2 rounded px-2 py-1"
                                 aria-label={`Dismiss notification for item ${notif.itemId || notif._id}`}
+                                disabled={isLoading}
                               >
                                 Dismiss
                               </button>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </motion.li>
                     ))}
                   </ul>

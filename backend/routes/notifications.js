@@ -260,17 +260,18 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete a notification (DELETE /api/notifications/:id)
+// Dismiss a notification (previously DELETE /api/notifications/:id, now updates status to 'dismissed')
 router.delete('/:id', async (req, res) => {
   try {
     const notification = await Notification.findById(req.params.id);
     if (!notification) {
       return res.status(404).json({ error: 'Notification not found' });
     }
-    await notification.deleteOne();
-    res.status(204).send();
+    notification.status = 'dismissed';
+    await notification.save();
+    res.status(200).json(notification);
   } catch (error) {
-    console.error('Error deleting notification:', error);
+    console.error('Error dismissing notification:', error);
     res.status(500).json({ error: error.message });
   }
 });
