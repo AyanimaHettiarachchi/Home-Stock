@@ -2,31 +2,57 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const mealOptions = {
   Breakfast: [
-    { name: "Oatmeal with Berries", calories: 200, basicIngredients: ["oats", "berries", "milk", "honey"] },
-    { name: "Pancakes with Maple Syrup", calories: 350, basicIngredients: ["flour", "eggs", "milk", "maple syrup"] },
-    { name: "Avocado Toast", calories: 250, basicIngredients: ["bread", "avocado", "lemon", "salt"] },
-    { name: "Greek Yogurt with Honey", calories: 180, basicIngredients: ["greek yogurt", "honey", "granola"] },
+    { 
+      name: "Strawberry Yogurt Parfait", 
+      calories: 220, 
+      basicIngredients: ["yogurt", "strawberries", "apples", "dairy milk"] 
+    },
+    { 
+      name: "Scrambled Eggs with Cheese", 
+      calories: 240, 
+      basicIngredients: ["eggs", "cheese", "butter", "cucumber"] 
+    },
   ],
   Lunch: [
-    { name: "Grilled Chicken Salad", calories: 400, basicIngredients: ["chicken breast", "lettuce", "tomatoes", "olive oil"] },
-    { name: "Turkey Sandwich", calories: 350, basicIngredients: ["bread", "turkey", "lettuce", "mayo"] },
-    { name: "Vegetable Stir-Fry", calories: 300, basicIngredients: ["mixed vegetables", "soy sauce", "garlic", "oil"] },
-    { name: "Quinoa Bowl with Veggies", calories: 380, basicIngredients: ["quinoa", "mixed veggies", "lemon", "olive oil"] },
+    { 
+      name: "Chicken Drumstick Salad", 
+      calories: 350, 
+      basicIngredients: ["chicken drumsticks", "cucumber", "yogurt", "soya sauce", "cheese"] 
+    },
+    { 
+      name: "Pizza Slice Melt with Apple Side", 
+      calories: 400, 
+      basicIngredients: ["pizza slices", "cheese", "apples", "fruit juice"] 
+    },
   ],
   Dinner: [
-    { name: "Roasted Salmon with Potatoes", calories: 500, basicIngredients: ["salmon", "potatoes", "olive oil", "rosemary"] },
-    { name: "Spaghetti Bolognese", calories: 600, basicIngredients: ["spaghetti", "ground beef", "tomato sauce", "onions"] },
-    { name: "Grilled Steak with Veggies", calories: 550, basicIngredients: ["steak", "mixed veggies", "garlic", "butter"] },
-    { name: "Vegetarian Lasagna", calories: 450, basicIngredients: ["lasagna noodles", "ricotta", "spinach", "tomato sauce"] },
+    { 
+      name: "Tofu Stir-Fry with Soya Sauce", 
+      calories: 300, 
+      basicIngredients: ["tofu", "cucumber", "soya sauce", "butter", "eggs"] 
+    },
+    { 
+      name: "Baked Chicken Drumsticks with Strawberry Sauce", 
+      calories: 450, 
+      basicIngredients: ["chicken drumsticks", "butter", "strawberries", "yogurt", "cheese"] 
+    },
   ],
   Snacks: [
-    { name: "Apple Slices with Peanut Butter", calories: 200, basicIngredients: ["apple", "peanut butter"] },
-    { name: "Mixed Nuts", calories: 180, basicIngredients: ["almonds", "cashews", "walnuts"] },
-    { name: "Cheese and Crackers", calories: 220, basicIngredients: ["cheese", "crackers"] },
-    { name: "Hummus with Carrots", calories: 150, basicIngredients: ["hummus", "carrots"] },
+    { 
+      name: "Apple and Cheese Bites", 
+      calories: 180, 
+      basicIngredients: ["apples", "cheese", "dairy milk"] 
+    },
+    { 
+      name: "Ice Cream and Strawberry Sundae", 
+      calories: 250, 
+      basicIngredients: ["ice cream", "strawberries", "dairy milk", "yogurt"] 
+    },
   ],
 };
 
@@ -45,6 +71,8 @@ export default function MealList() {
   const [emailError, setEmailError] = useState("");
   const [extraIngredientsError, setExtraIngredientsError] = useState("");
   const [formError, setFormError] = useState("");
+  const [inventory, setInventory] = useState([]);
+  const userId = '507f1f77bcf86cd799439011';
 
   const today = new Date();
   const todayFormatted = today.toISOString().split("T")[0];
@@ -73,6 +101,16 @@ export default function MealList() {
         console.error("Error fetching meals:", err);
         setFormError("Failed to load meals. Please try again.");
       });
+
+    axios
+      .get(`http://localhost:7001/api/inventory/${userId}`)
+      .then((res) => {
+        setInventory(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching inventory:", err);
+        setFormError("Failed to fetch inventory items.");
+      });
   }, []);
 
   const handleSearchChange = (e) => {
@@ -96,181 +134,99 @@ export default function MealList() {
     }
 
     const userName = filteredMeals[0].userName;
-    const totalCalories = filteredMeals.reduce((sum, meal) => sum + Number(meal.calories), 0);
-    const averageCalories = filteredMeals.length > 0 ? (totalCalories / filteredMeals.length).toFixed(1) : 0;
-
-    const calorieRanges = {
-      "0-200": 0,
-      "201-400": 0,
-      "401-600": 0,
-      "601-800": 0,
-      "801+": 0,
-    };
-
-    filteredMeals.forEach((meal) => {
-      const calories = Number(meal.calories);
-      if (calories <= 200) calorieRanges["0-200"]++;
-      else if (calories <= 400) calorieRanges["201-400"]++;
-      else if (calories <= 600) calorieRanges["401-600"]++;
-      else if (calories <= 800) calorieRanges["601-800"]++;
-      else calorieRanges["801+"]++;
-    });
-
     const doc = new jsPDF();
 
-    // Add Logo (Placeholder)
-    // Replace the line below with your base64-encoded logo string
-    // Example: const logoBase64 = "data:image/png;base64,iVBORw0KGgo...";
-    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
-    // You need to provide the base64 string for your logo
-    // For now, I'll comment this out since I don't have the logo
-    // doc.addImage(logoBase64, "PNG", 10, 10, 20, 20);
-
     // Header
-    doc.setFontSize(22);
-    doc.setTextColor(0, 102, 204);
+    doc.setFillColor(33, 150, 243); // Blue background
+    doc.rect(0, 0, 210, 40, 'F');
+
+    // Header Text
+    doc.setFontSize(24);
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.text("Home Stock", 20, 20);
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "normal");
-    doc.text("Meal Report", 20, 32);
 
-    // Summary Section
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Summary", 20, 50);
+    // Add Logo beside "Home Stock"
+    const logoUrl = 'https://cdn-icons-png.flaticon.com/512/5968/5968817.png';
+    doc.addImage(logoUrl, 'PNG', 60, 10, 20, 20); // Logo at x=60mm, y=10mm, 20mm x 20mm
 
+    doc.setFontSize(16);
+    doc.text("Meal Report", 20, 30);
+
+    // Subtitle
     doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
     doc.setFont("helvetica", "normal");
-    doc.text(`Total Meals: ${filteredMeals.length}`, 20, 60);
-    doc.text(`Average Calories: ${averageCalories}/Meal`, 70, 60);
-    doc.text("Calories Breakdown:", 120, 60);
-    doc.text(`0-200: ${calorieRanges["0-200"]}`, 130, 70);
-    doc.text(`201-400: ${calorieRanges["201-400"]}`, 130, 80);
-    doc.text(`401-600: ${calorieRanges["401-600"]}`, 130, 90);
-    doc.text(`601-800: ${calorieRanges["601-800"]}`, 130, 100);
-    doc.text(`801+: ${calorieRanges["801+"]}`, 130, 110);
+    doc.text(`Generated for: ${userName}`, 20, 50);
+    doc.text(`Date: ${todayFormatted}`, 20, 58);
 
-    // Table of Meal Entries (Centered)
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    const tableWidth = 190; // New table width to fit within margins
-    const pageWidth = 210; // A4 page width
-    const margin = (pageWidth - tableWidth) / 2; // Center the table
-    const tableStartX = margin; // Starting x position (10)
+    // Table Setup
+    const tableWidth = 170;
+    const pageWidth = 210;
+    const margin = (pageWidth - tableWidth) / 2;
+    const tableStartX = margin;
+    const tableStartY = 70;
 
-    doc.text("All Meal Entries", tableStartX, 130); // Center the title with the table
-
-    // Table Headers with Background and Borders
-    doc.setFontSize(10);
-    doc.setTextColor(0, 102, 204);
-    doc.setFillColor(240, 240, 240);
-    doc.rect(tableStartX, 135, tableWidth, 10, "F"); // Background for header row
-    doc.setDrawColor(0, 0, 0);
-
-    // Define column widths and positions
     const colWidths = {
-      mealId: 15,
-      userName: 23,
-      email: 23,
-      mealName: 23,
-      mealType: 23,
-      calories: 15,
-      ingredients: 38,
-      date: 30,
+      mealId: 25,
+      userName: 40,
+      mealName: 55,
+      date: 50,
     };
 
-    let xPos = tableStartX;
-    doc.rect(xPos, 135, colWidths.mealId, 10); // Meal ID
-    xPos += colWidths.mealId;
-    doc.rect(xPos, 135, colWidths.userName, 10); // User Name
-    xPos += colWidths.userName;
-    doc.rect(xPos, 135, colWidths.email, 10); // Email
-    xPos += colWidths.email;
-    doc.rect(xPos, 135, colWidths.mealName, 10); // Meal Name
-    xPos += colWidths.mealName;
-    doc.rect(xPos, 135, colWidths.mealType, 10); // Meal Type
-    xPos += colWidths.mealType;
-    doc.rect(xPos, 135, colWidths.calories, 10); // Calories
-    xPos += colWidths.calories;
-    doc.rect(xPos, 135, colWidths.ingredients, 10); // Ingredients
-    xPos += colWidths.ingredients;
-    doc.rect(xPos, 135, colWidths.date, 10); // Date
-
-    let yPos = 142;
-    xPos = tableStartX;
-    doc.text("Meal ID", xPos + 2, yPos);
-    xPos += colWidths.mealId;
-    doc.text("User Name", xPos + 2, yPos);
-    xPos += colWidths.userName;
-    doc.text("Email", xPos + 2, yPos);
-    xPos += colWidths.email;
-    doc.text("Meal Name", xPos + 2, yPos);
-    xPos += colWidths.mealName;
-    doc.text("Meal Type", xPos + 2, yPos);
-    xPos += colWidths.mealType;
-    doc.text("Calories", xPos + 2, yPos);
-    xPos += colWidths.calories;
-    doc.text("Ingredients", xPos + 2, yPos);
-    xPos += colWidths.ingredients;
-    doc.text("Date", xPos + 2, yPos);
-    yPos += 5;
-
-    // Table Rows with Alternating Background
+    // Table Header
+    doc.setFillColor(240, 240, 240); // Light gray background
+    doc.rect(tableStartX, tableStartY, tableWidth, 10, "F");
     doc.setFontSize(11);
+    doc.setTextColor(33, 150, 243); // Blue text
+    doc.setFont("helvetica", "bold");
+
+    let xPos = tableStartX;
+    doc.rect(xPos, tableStartY, colWidths.mealId, 10);
+    doc.text("Meal ID", xPos + 2, tableStartY + 7);
+    xPos += colWidths.mealId;
+    doc.rect(xPos, tableStartY, colWidths.userName, 10);
+    doc.text("User Name", xPos + 2, tableStartY + 7);
+    xPos += colWidths.userName;
+    doc.rect(xPos, tableStartY, colWidths.mealName, 10);
+    doc.text("Meal Name", xPos + 2, tableStartY + 7);
+    xPos += colWidths.mealName;
+    doc.rect(xPos, tableStartY, colWidths.date, 10);
+    doc.text("Date", xPos + 2, tableStartY + 7);
+
+    // Table Rows
+    let yPos = tableStartY + 10;
+    const rowHeight = 10;
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.setDrawColor(0, 0, 0);
-    const rowHeight = 15;
-    let rowIndex = 0;
-    filteredMeals.forEach((meal) => {
-      if (yPos > 250) {
+    doc.setFont("helvetica", "normal");
+
+    filteredMeals.forEach((meal, index) => {
+      if (yPos > 260) {
         doc.addPage();
         yPos = 20;
       }
-      // Alternating row background
-      if (rowIndex % 2 === 1) {
-        doc.setFillColor(245, 245, 245);
-        doc.rect(tableStartX, yPos - 5, tableWidth, rowHeight, "F");
-      }
-      // Draw borders for each cell
-      xPos = tableStartX;
-      doc.rect(xPos, yPos - 5, colWidths.mealId, rowHeight); // Meal ID
-      xPos += colWidths.mealId;
-      doc.rect(xPos, yPos - 5, colWidths.userName, rowHeight); // User Name
-      xPos += colWidths.userName;
-      doc.rect(xPos, yPos - 5, colWidths.email, rowHeight); // Email
-      xPos += colWidths.email;
-      doc.rect(xPos, yPos - 5, colWidths.mealName, rowHeight); // Meal Name
-      xPos += colWidths.mealName;
-      doc.rect(xPos, yPos - 5, colWidths.mealType, rowHeight); // Meal Type
-      xPos += colWidths.mealType;
-      doc.rect(xPos, yPos - 5, colWidths.calories, rowHeight); // Calories
-      xPos += colWidths.calories;
-      doc.rect(xPos, yPos - 5, colWidths.ingredients, rowHeight); // Ingredients
-      xPos += colWidths.ingredients;
-      doc.rect(xPos, yPos - 5, colWidths.date, rowHeight); // Date
 
-      // Add text to each cell
-      const textYPos = yPos + (rowHeight / 2) - 2;
+      // Alternating row background
+      if (index % 2 === 0) {
+        doc.setFillColor(245, 245, 245); // Very light gray
+        doc.rect(tableStartX, yPos, tableWidth, rowHeight, "F");
+      }
+
       xPos = tableStartX;
-      doc.text(meal.mealId || "N/A", xPos + 2, textYPos);
+      doc.rect(xPos, yPos, colWidths.mealId, rowHeight);
+      doc.text(meal.mealId || "N/A", xPos + 2, yPos + 7);
       xPos += colWidths.mealId;
-      doc.text((meal.userName || "N/A").substring(0, 10), xPos + 2, textYPos);
+      doc.rect(xPos, yPos, colWidths.userName, rowHeight);
+      doc.text((meal.userName || "N/A").substring(0, 20), xPos + 2, yPos + 7);
       xPos += colWidths.userName;
-      doc.text((meal.email || "N/A").substring(0, 15), xPos + 2, textYPos);
-      xPos += colWidths.email;
-      doc.text(meal.mealName.substring(0, 15), xPos + 2, textYPos);
+      doc.rect(xPos, yPos, colWidths.mealName, rowHeight);
+      doc.text(meal.mealName.substring(0, 30), xPos + 2, yPos + 7);
       xPos += colWidths.mealName;
-      doc.text(meal.mealType.substring(0, 10), xPos + 2, textYPos);
-      xPos += colWidths.mealType;
-      doc.text(meal.calories.toString(), xPos + 2, textYPos);
-      xPos += colWidths.calories;
-      doc.text(meal.ingredients.substring(0, 25), xPos + 2, textYPos);
-      xPos += colWidths.ingredients;
-      doc.text(meal.day, xPos + 2, textYPos);
+      doc.rect(xPos, yPos, colWidths.date, rowHeight);
+      doc.text(meal.day, xPos + 2, yPos + 7);
+
       yPos += rowHeight;
-      rowIndex++;
     });
 
     // Footer
@@ -278,17 +234,12 @@ export default function MealList() {
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.setDrawColor(0, 0, 0);
-      doc.line(20, doc.internal.pageSize.height - 40, 270, doc.internal.pageSize.height - 40);
-      doc.text("Home Stock", 20, doc.internal.pageSize.height - 30);
-      doc.text("Address: 64/ Main Street, Colombo - 10", 20, doc.internal.pageSize.height - 20);
-      doc.text("Phone: +94 (70) 5346902 | Email: support@homestock.com", 20, doc.internal.pageSize.height - 10);
-      doc.text("Website: www.homestock.com", 20, doc.internal.pageSize.height - 5);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "normal");
+      doc.text("Home Stock | www.homestock.com", 20, doc.internal.pageSize.height - 10);
       doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
     }
 
-    // Save the PDF
     doc.save(`Meal_Report_${userName}_${todayFormatted}.pdf`);
     setFormError("");
   };
@@ -374,6 +325,8 @@ export default function MealList() {
       setSelectedMeal(selected);
       setExtraIngredients("");
       setExtraIngredientsError("");
+      // Save selected meal ingredients to local storage
+      localStorage.setItem('selectedMealIngredients', JSON.stringify(mealData.basicIngredients));
     }
   };
 
@@ -463,6 +416,51 @@ export default function MealList() {
     }
   };
 
+  const showDeleteConfirmation = (mealId) => {
+    toast(
+      <div className="flex flex-col items-center p-4">
+        <p className="text-gray-800 font-semibold mb-4">
+          Are you sure you want to delete this meal?
+        </p>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => {
+              handleDeleteMeal(mealId);
+              toast.dismiss();
+              toast.success(
+                <div className="flex items-center">
+                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Meal deleted successfully!
+                </div>,
+                {
+                  className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
+                  autoClose: 3000,
+                }
+              );
+            }}
+            className="bg-red-500 text-white px-4 py-2 rounded-full font-medium hover:bg-red-600 transition-colors duration-300"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors duration-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        className: 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-l-4 border-yellow-500 shadow-lg',
+        autoClose: false,
+        closeButton: false,
+        position: "top-center",
+      }
+    );
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col"
@@ -493,7 +491,7 @@ export default function MealList() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `text-white text-sm md:text-lg hover:text-purple-300 transition-Colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
+                `text-white text-sm md:text-lg hover:text-purple-300 transition-colors duration-300 ${isActive ? 'underline underline-offset-4' : ''}`
               }
             >
               Home
@@ -597,125 +595,114 @@ export default function MealList() {
               </tr>
             </thead>
             <tbody>
-              {filteredMeals.length === 0 ? (
-                <tr>
-                  <td colSpan="9" className="p-4 text-center text-gray-600">
-                    No meals found.
+              {filteredMeals.map((meal) => (
+                <tr key={meal._id} className="border-b hover:bg-gray-50">
+                  <td className="p-4 text-gray-700">{meal.mealId}</td>
+                  <td className="p-4 text-gray-700">{meal.userName}</td>
+                  <td className="p-4 text-gray-700">{meal.email}</td>
+                  <td className="p-4 text-gray-700">{meal.mealName}</td>
+                  <td className="p-4 text-gray-700">{meal.mealType}</td>
+                  <td className="p-4 text-gray-700">{meal.calories}</td>
+                  <td className="p-4 text-gray-700">{meal.ingredients}</td>
+                  <td className="p-4 text-gray-700">{meal.day}</td>
+                  <td className="p-4">
+                    <button
+                      onClick={() => {
+                        setEditingMeal(meal);
+                        setNewMeal({
+                          mealId: meal.mealId,
+                          userName: meal.userName,
+                          email: meal.email,
+                          mealName: meal.mealName,
+                          mealType: meal.mealType,
+                          calories: meal.calories.toString(),
+                          ingredients: meal.ingredients,
+                          day: meal.day,
+                        });
+                        setSelectedMeal(meal.mealName);
+                        setExtraIngredients("");
+                        setShowForm(true);
+                        setFormError("");
+                        setUserNameError("");
+                        setEmailError("");
+                        setExtraIngredientsError("");
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-lg mr-2 hover:bg-yellow-600 transition-colors duration-300"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => showDeleteConfirmation(meal._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors duration-300"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              ) : (
-                filteredMeals.map((meal) => (
-                  <tr key={meal._id} className="border-b hover:bg-gray-50 transition-colors duration-200">
-                    <td className="p-4 text-gray-600">{meal.mealId || "N/A"}</td>
-                    <td className="p-4 text-gray-600">{meal.userName || "N/A"}</td>
-                    <td className="p-4 text-gray-600">{meal.email || "N/A"}</td>
-                    <td className="p-4 text-gray-600">{meal.mealName}</td>
-                    <td className="p-4 text-gray-600">{meal.mealType}</td>
-                    <td className="p-4 text-gray-600">{meal.calories}</td>
-                    <td className="p-4 text-gray-600">{meal.ingredients}</td>
-                    <td className="p-4 text-gray-600">{meal.day}</td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => {
-                          setNewMeal(meal);
-                          setEditingMeal(meal);
-                          setSelectedMeal(meal.mealName);
-                          const mealData = mealOptions[meal.mealType].find((m) => m.name === meal.mealName);
-                          if (mealData) {
-                            const basic = mealData.basicIngredients.join(", ");
-                            const extra = meal.ingredients
-                              .split(", ")
-                              .filter((ing) => !mealData.basicIngredients.includes(ing))
-                              .join(", ");
-                            setExtraIngredients(extra);
-                          } else {
-                            setExtraIngredients(meal.ingredients);
-                          }
-                          setShowForm(true);
-                          setFormError("");
-                          setEmailError("");
-                          setExtraIngredientsError("");
-                        }}
-                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300 font-medium"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteMeal(meal._id)}
-                        className="text-red-500 ml-4 hover:text-red-700 transition-colors duration-300 font-medium"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
 
         {showForm && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-            <div
-              className="p-6 rounded-2xl shadow-2xl w-full max-w-lg backdrop-blur-sm"
-              style={{
-                backgroundImage: `url('https://img.freepik.com/free-photo/couple-eating-salad-browsing-streaming-service-site_23-2147930585.jpg?t=st=1742719923~exp=1742723523~hmac=ac3e6578241d0ceb0c290a8be42f8c547f2cdcff7bd415efd137c60c32670e4d&w=740')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                backgroundBlendMode: 'overlay',
-              }}
-            >
-              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">
-                {editingMeal ? "Edit Meal" : "Add New Meal"}
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                {editingMeal ? "Edit Meal Plan" : "Create New Meal Plan"}
               </h3>
-
-              <div className="space-y-4">
+              {formError && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+                  {formError}
+                </div>
+              )}
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Meal ID</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Meal ID</label>
                   <input
                     type="text"
                     value={newMeal.mealId}
-                    readOnly
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                    onChange={(e) => setNewMeal({ ...newMeal, mealId: e.target.value })}
+                    className="w-full p-3 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
+                    placeholder="e.g., 0001"
+                    disabled
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">User Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">User Name</label>
                   <input
                     type="text"
-                    placeholder="User Name"
                     value={newMeal.userName}
                     onChange={handleUserNameChange}
-                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-                      userNameError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                    className={`w-full p-3 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200 ${
+                      userNameError ? "border-red-300" : "border-gray-200"
                     }`}
+                    placeholder="e.g., John Doe"
                   />
                   {userNameError && (
                     <p className="text-red-500 text-xs mt-1">{userNameError}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                   <input
                     type="email"
-                    placeholder="Email"
                     value={newMeal.email}
                     onChange={handleEmailChange}
-                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-                      emailError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                    className={`w-full p-3 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200 ${
+                      emailError ? "border-red-300" : "border-gray-200"
                     }`}
+                    placeholder="e.g., john@example.com"
                   />
                   {emailError && (
                     <p className="text-red-500 text-xs mt-1">{emailError}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Meal Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Meal Type</label>
                   <select
                     value={newMeal.mealType}
                     onChange={handleMealTypeChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    className="w-full p-3 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
                   >
                     <option value="Breakfast">Breakfast</option>
                     <option value="Lunch">Lunch</option>
@@ -724,14 +711,13 @@ export default function MealList() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Meal</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Select Meal</label>
                   <select
                     value={selectedMeal}
                     onChange={handleMealSelection}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                    required
+                    className="w-full p-3 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
                   >
-                    <option value="">Select a meal...</option>
+                    <option value="">Select a meal</option>
                     {mealOptions[newMeal.mealType].map((meal, index) => (
                       <option key={index} value={meal.name}>
                         {meal.name}
@@ -740,112 +726,103 @@ export default function MealList() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Calories</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Calories</label>
                   <input
-                    type="number"
-                    placeholder="Calories"
+                    type="text"
                     value={newMeal.calories}
-                    onChange={(e) => setNewMeal({ ...newMeal, calories: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                    required
+                    disabled
+                    className="w-full p-3 bg-gray-100 border border-gray-200 rounded-lg text-gray-700"
+                    placeholder="Calories will be auto-filled"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Basic Ingredients</label>
-                  <textarea
-                    value={newMeal.ingredients}
-                    readOnly
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 resize-none"
-                    rows="2"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Basic Ingredients</label>
+                  {newMeal.ingredients ? (
+                    <ul className="space-y-2">
+                      {newMeal.ingredients.split(", ").map((ingredient, index) => (
+                        <li key={index} className="flex items-center text-gray-700 text-sm">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                          {ingredient}
+                          <span
+                            className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                              inventory.some(
+                                (item) =>
+                                  item.name.toLowerCase().trim() ===
+                                  ingredient.toLowerCase().trim()
+                              )
+                                ? "bg-green-100 text-green-600"
+                                : "bg-red-100 text-red-600"
+                            }`}
+                          >
+                            {inventory.some(
+                              (item) =>
+                                item.name.toLowerCase().trim() ===
+                                ingredient.toLowerCase().trim()
+                            )
+                              ? "In Stock"
+                              : "Not in Stock"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-gray-500 text-sm">Select a meal to view ingredients</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Extra Ingredients</label>
-                  <textarea
-                    placeholder="Add extra ingredients (comma separated)"
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Extra Ingredients (comma-separated)
+                  </label>
+                  <input
+                    type="text"
                     value={extraIngredients}
                     onChange={handleExtraIngredientsChange}
-                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-                      extraIngredientsError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                    className={`w-full p-3 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200 ${
+                      extraIngredientsError ? "border-red-300" : "border-gray-200"
                     }`}
-                    rows="2"
+                    placeholder="e.g., cheese, parsley"
                   />
                   {extraIngredientsError && (
                     <p className="text-red-500 text-xs mt-1">{extraIngredientsError}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Date</label>
                   <input
-                    type="text"
+                    type="date"
                     value={newMeal.day}
-                    readOnly
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                    onChange={(e) => setNewMeal({ ...newMeal, day: e.target.value })}
+                    className="w-full p-3 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
                   />
                 </div>
               </div>
-
-              <div className="flex justify-end mt-6 space-x-3">
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={handleSaveMeal}
+                  className="bg-blue-500 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
+                >
+                  {editingMeal ? "Update Meal" : "Save Meal"}
+                </button>
                 <button
                   onClick={() => {
                     setShowForm(false);
-                    setNewMeal({
-                      mealId: generateMealId(),
-                      userName: "",
-                      email: "",
-                      mealName: "",
-                      mealType: "Breakfast",
-                      calories: "",
-                      ingredients: "",
-                      day: todayFormatted,
-                    });
-                    setSelectedMeal("");
-                    setExtraIngredients("");
+                    setEditingMeal(null);
+                    setFormError("");
                     setUserNameError("");
                     setEmailError("");
                     setExtraIngredientsError("");
-                    setFormError("");
-                    setEditingMeal(null);
                   }}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors duration-300"
+                  className="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200"
                 >
                   Cancel
-                </button>
-                <button
-                  onClick={handleSaveMeal}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-full font-medium hover:bg-blue-600 transition-colors duration-300 shadow-md"
-                >
-                  Save
                 </button>
               </div>
             </div>
           </div>
         )}
-      </main>
 
-      <footer className="w-full bg-gradient-to-r from-gray-900/80 to-gray-900/80 backdrop-blur-md shadow-lg">
-        <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
-          <div className="flex justify-center items-center space-x-3 mb-4">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
-              alt="Footer Logo"
-              className="w-10 h-10 object-contain hover:scale-105 transition-transform duration-300"
-            />
-            <p className="text-white text-sm md:text-base">© 2025 Home Stock Manager. All rights reserved.</p>
-          </div>
-          <div className="flex justify-center space-x-4 md:space-x-6 mb-4">
-            <a href="#about" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              About
-            </a>
-            <a href="#contact" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              Contact
-            </a>
-            <a href="#privacy" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              Privacy Policy
-            </a>
-          </div>
-        </div>
-      </footer>
+        <ToastContainer />
+      </main>
     </div>
   );
 }

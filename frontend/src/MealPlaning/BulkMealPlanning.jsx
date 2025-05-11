@@ -1,8 +1,9 @@
-// frontend/src/MealPlaning/BulkMealPlanning.jsx
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Animation variants for fade-in
 const fadeIn = {
@@ -40,7 +41,6 @@ const mealOptions = {
 export default function BulkMealPlanning() {
   const [mealPlans, setMealPlans] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     weekStartDate: '',
     meals: {
@@ -49,16 +49,19 @@ export default function BulkMealPlanning() {
       wednesday: { breakfast: '', lunch: '', dinner: '' },
       thursday: { breakfast: '', lunch: '', dinner: '' },
       friday: { breakfast: '', lunch: '', dinner: '' },
-      saturday: { breakfast: '', lunch: '', dinner: '' },
+      saturday: { breakfast: '', deploying: '', dinner: '' },
       sunday: { breakfast: '', lunch: '', dinner: '' },
     },
   });
   const [error, setError] = useState('');
-
+  const [inventory, setInventory] = useState([]);
+  const [recentPlan, setRecentPlan] = useState(null);
+  const userId = '507f1f77bcf86cd799439011';
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     fetchMealPlans();
+    fetchInventory();
   }, []);
 
   const fetchMealPlans = async () => {
@@ -67,6 +70,16 @@ export default function BulkMealPlanning() {
       setMealPlans(response.data);
     } catch (err) {
       console.error('Error fetching meal plans:', err);
+    }
+  };
+
+  const fetchInventory = async () => {
+    try {
+      const response = await axios.get(`http://localhost:7001/api/inventory/${userId}`);
+      setInventory(response.data);
+    } catch (err) {
+      console.error('Error fetching inventory:', err);
+      setError('Failed to fetch inventory items.');
     }
   };
 
@@ -129,7 +142,7 @@ export default function BulkMealPlanning() {
         },
       });
       setError('');
-      navigate(`/meal-plan-details/${savedPlan._id}`);
+      setRecentPlan(savedPlan);
     } catch (err) {
       console.error('Error saving meal plan:', err);
       setError('Failed to save meal plan. Please try again.');
@@ -143,14 +156,31 @@ export default function BulkMealPlanning() {
       meals: plan.meals,
     });
     setError('');
+    setRecentPlan(null);
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this meal plan?');
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`http://localhost:7001/api/meal-plans/${id}`);
       setMealPlans(mealPlans.filter((plan) => plan._id !== id));
+      if (recentPlan && recentPlan._id === id) {
+        setRecentPlan(null);
+      }
+      toast.success('Meal plan deleted successfully!', {
+        position: 'top-center',
+        autoClose: 3000,
+        className: 'bg-gradient-to-r from-green-100 to-green-200 border-l-4 border-green-500 shadow-lg',
+      });
     } catch (err) {
       console.error('Error deleting meal plan:', err);
+      toast.error('Failed to delete meal plan', {
+        position: 'top-center',
+        autoClose: 3000,
+        className: 'bg-gradient-to-r from-red-100 to-red-200 border-l-4 border-red-500 shadow-lg',
+      });
     }
   };
 
@@ -347,105 +377,89 @@ export default function BulkMealPlanning() {
             </form>
           </motion.div>
 
-          {/* List of Existing Meal Plans - Enhanced Design */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mealPlans.map((plan) => (
-              <motion.div
-                key={plan._id}
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
-                className="bg-gradient-to-br from-teal-500/20 via-blue-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-teal-300/30 hover:shadow-xl transition-shadow duration-300"
-              >
-                <h3 className="text-2xl font-semibold text-teal-100 mb-4 text-center bg-teal-700/50 py-2 rounded-lg">
-                  Week of {new Date(plan.weekStartDate).toLocaleDateString()}
+          {/* Recent Meal Plan Details */}
+          {recentPlan && (
+            <motion.div
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              className="bg-gray-500/30 backdrop-blur-md rounded-2xl shadow-lg p-6 mb-8"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-semibold text-white">
+                  Recent Meal Plan: Week of {new Date(recentPlan.weekStartDate).toLocaleDateString()}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Left Column: Monday - Wednesday */}
-                  <div>
-                    {daysOfWeek.slice(0, 3).map((day) => (
-                      <div key={day} className="mb-3">
-                        <h4 className="text-lg font-medium text-teal-200 capitalize bg-teal-600/30 py-1 px-2 rounded">{day}</h4>
-                        <p className="text-blue-100 text-sm mt-1">
-                          <span className="font-medium">B:</span> {plan.meals[day].breakfast || 'Not set'}
-                        </p>
-                        <p className="text-blue-100 text-sm">
-                          <span className="font-medium">L:</span> {plan.meals[day].lunch || 'Not set'}
-                        </p>
-                        <p className="text-blue-100 text-sm">
-                          <span className="font-medium">D:</span> {plan.meals[day].dinner || 'Not set'}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Right Column: Thursday - Sunday */}
-                  <div>
-                    {daysOfWeek.slice(3).map((day) => (
-                      <div key={day} className="mb-3">
-                        <h4 className="text-lg font-medium text-teal-200 capitalize bg-teal-600/30 py-1 px-2 rounded">{day}</h4>
-                        <p className="text-blue-100 text-sm mt-1">
-                          <span className="font-medium">B:</span> {plan.meals[day].breakfast || 'Not set'}
-                        </p>
-                        <p className="text-blue-100 text-sm">
-                          <span className="font-medium">L:</span> {plan.meals[day].lunch || 'Not set'}
-                        </p>
-                        <p className="text-blue-100 text-sm">
-                          <span className="font-medium">D:</span> {plan.meals[day].dinner || 'Not set'}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                <button
+                  onClick={() => setRecentPlan(null)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-300"
+                >
+                  Clear
+                </button>
+              </div>
+              {daysOfWeek.map((day) => (
+                <div key={day} className="mb-4">
+                  <h4 className="text-lg font-medium text-white capitalize mb-2">{day}</h4>
+                  <p className="text-white">Breakfast: {recentPlan.meals[day].breakfast || 'Not set'}</p>
+                  <p className="text-white">Lunch: {recentPlan.meals[day].lunch || 'Not set'}</p>
+                  <p className="text-white">Dinner: {recentPlan.meals[day].dinner || 'Not set'}</p>
                 </div>
-                <div className="flex justify-center space-x-4 mt-4">
-                  <button
-                    onClick={() => handleEdit(plan)}
-                    className="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition-all duration-300 shadow-md"
+              ))}
+            </motion.div>
+          )}
+
+          {/* Existing Meal Plans */}
+          <motion.div
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-gray-500/30 backdrop-blur-md rounded-2xl shadow-lg p-6"
+          >
+            <h3 className="text-2xl font-semibold text-white mb-4">Existing Meal Plans</h3>
+            {mealPlans.length === 0 ? (
+              <p className="text-gray-200">No meal plans available.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {mealPlans.map((plan) => (
+                  <motion.div
+                    key={plan._id}
+                    className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700/70 transition-all duration-300"
+                    whileHover={{ scale: 1.03 }}
                   >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(plan._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300 shadow-md"
-                  >
-                    Delete
-                  </button>
-                  <NavLink
-                    to={`/meal-plan-details/${plan._id}`}
-                    className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md"
-                  >
-                    View Details
-                  </NavLink>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                    <h4 className="text-lg font-medium text-white">
+                      Week of {new Date(plan.weekStartDate).toLocaleDateString()}
+                    </h4>
+                    <p className="text-gray-200">
+                      Meals Planned: {Object.values(plan.meals).flatMap(Object.values).filter(Boolean).length}
+                    </p>
+                    <div className="mt-4 flex space-x-2">
+                      <NavLink
+                        to={`/meal-plan-details/${plan._id}`}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
+                      >
+                        View
+                      </NavLink>
+                      <button
+                        onClick={() => handleEdit(plan)}
+                        className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all duration-300"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(plan._id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
         </motion.div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full bg-gray-900/30 backdrop-blur-md shadow-lg">
-        <div className="max-w-7xl mx-auto py-6 px-4 md:px-6 text-center">
-          <div className="flex justify-center items-center space-x-3 mb-4">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/5968/5968817.png"
-              alt="Footer Logo"
-              className="w-10 h-10 object-contain hover:scale-105 transition-transform duration-300"
-            />
-            <p className="text-white text-sm md:text-base">© 2025 Home Stock Manager. All rights reserved.</p>
-          </div>
-          <div className="flex justify-center space-x-4 md:space-x-6 mb-4">
-            <a href="#about" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              About
-            </a>
-            <a href="#contact" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              Contact
-            </a>
-            <a href="#privacy" className="text-gray-300 text-sm md:text-base hover:text-purple-300 transition-colors duration-300">
-              Privacy Policy
-            </a>
-          </div>
-        </div>
-      </footer>
+      <ToastContainer />
     </div>
   );
 }
